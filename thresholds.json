@@ -8,6 +8,6 @@
     "carelon medical benefits management": { "asaMax": 30, "ahtMax": 480 },
     "legacy behavioral health": { "asaMax": 45, "ahtMax": 620 },
     "carelon subrogation": { "asaMax": 90, "ahtMax": 420 },
-    "carelon provider (cpcs)": { "asaMax": 60, "ahtMax": 420 }
+    "caremore provider (cpcs)": { "asaMax": 60, "ahtMax": 420 }
   }
 }
