@@ -49,7 +49,6 @@
     .table-card{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-soft);overflow:hidden}
     .table-wrap{overflow:auto;max-height:74vh}
     table{border-collapse:separate;border-spacing:0;width:100%;min-width:1180px}
-
     thead th{
       position:sticky;top:0;z-index:5;background:var(--sticky);
       border-bottom:1px solid var(--border);
@@ -61,7 +60,6 @@
 
     tr.parent{background:#fff !important;font-weight:750}
     tr.parent td{border-bottom:1px solid rgba(226,232,240,.9)}
-
     td.lob-toggle{cursor:pointer;user-select:none}
     td.lob-toggle:focus{outline:none;box-shadow:inset 0 0 0 2px rgba(29,78,216,.35);border-radius:8px}
     .lob-cell{display:flex;align-items:center;gap:10px}
@@ -83,6 +81,19 @@
 
     thead th:first-child{border-top-left-radius:16px}
     thead th:last-child{border-top-right-radius:16px}
+
+    .error-card{
+      margin-top: 14px;
+      border: 1px solid rgba(220,38,38,.25);
+      background: rgba(220,38,38,.06);
+      color: #7f1d1d;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: none;
+      white-space: pre-wrap;
+      font-size: 13px;
+    }
+    .error-card b{color:#7f1d1d}
   </style>
 </head>
 
@@ -94,9 +105,9 @@
           <h1>CS+ Efficiency Interval Report</h1>
           <div class="subtitle">day, <span id="reportStamp">Loading…</span></div>
         </div>
-        <div class="pill" title="Data source loaded from SORA-Eff-Int.csv">
+        <div class="pill" title="Data source">
           <span class="dot"></span>
-          <span>Source: <b>SORA-Eff-Int.csv</b></span>
+          <span>Thresholds: <b>thresholds.json</b></span>
         </div>
       </div>
 
@@ -118,6 +129,8 @@
       </div>
     </div>
 
+    <div id="err" class="error-card"></div>
+
     <div class="table-card">
       <div class="table-wrap">
         <table id="tbl">
@@ -129,28 +142,55 @@
   </div>
 
 <script>
-/* ===== Subtitle stamp ===== */
+/* ===================== CONFIG =====================
+
+Your SharePoint link is an Excel share link (/:x:/) and likely won't be fetchable
+from GitHub Pages due to auth/CORS.
+If/when you get a true CSV direct endpoint (or a proxy), replace DATA_CSV_URL.
+
+=================================================== */
+const DATA_CSV_URL = "https://collaborate.wellpoint.com/:x:/s/CSWFMTeam/IQBhw8rpNp3jQqDCwGJiF5mpARLH-eI-3L2gj2GlNSgDLQI?e=Xqe6cg";
+const THRESHOLDS_URL = "./thresholds.json";  // in GitHub repo
+const META_URL = "./meta.json";              // in GitHub repo
+
+function showError(msg){
+  const el = document.getElementById("err");
+  el.style.display = "block";
+  el.textContent = msg;
+}
+
+/* ===== meta.json stamp ===== */
 function formatDateLong(d){ return d.toLocaleDateString(undefined, {year:"numeric",month:"long",day:"2-digit"}); }
 function formatTimeOnly(d){ return d.toLocaleTimeString(undefined, {hour:"numeric",minute:"2-digit"}); }
-function getAsOfTimeFromQuery(){
-  const asof = (new URLSearchParams(location.search).get("asof") || "").trim();
-  return /^\d{1,2}:\d{2}$/.test(asof) ? asof : null;
-}
-function setSubtitleStamp(){
+
+async function setSubtitleStampFromMeta(){
   const el = document.getElementById("reportStamp");
-  if(!el) return;
-  const now = new Date();
-  const dateText = formatDateLong(now);
-  const asof = getAsOfTimeFromQuery();
+  const today = new Date();
+  const dateText = formatDateLong(today);
+
+  let asOfTime = null;
+  try{
+    const res = await fetch(META_URL, { cache: "no-store" });
+    if(res.ok){
+      const meta = await res.json();
+      if(meta && typeof meta.asOfTime === "string" && /^\d{1,2}:\d{2}$/.test(meta.asOfTime.trim())){
+        asOfTime = meta.asOfTime.trim();
+      }
+    }
+  } catch(e){
+    // if meta missing, we'll fallback to "now"
+  }
+
   let timeText;
-  if(asof){
-    const [hh, mm] = asof.split(":").map(Number);
-    const d = new Date(now);
+  if(asOfTime){
+    const [hh, mm] = asOfTime.split(":").map(Number);
+    const d = new Date(today);
     d.setHours(hh, mm, 0, 0);
     timeText = formatTimeOnly(d);
   } else {
-    timeText = formatTimeOnly(now);
+    timeText = formatTimeOnly(today);
   }
+
   el.textContent = `${dateText} — as of ${timeText}`;
 }
 
@@ -197,17 +237,13 @@ function formatCell(v, headerName){
   return v;
 }
 
-/* ===== Group logic (robust for your CSV) ===== */
-function normalizeLOB(lobRaw){
-  return (lobRaw ?? "").toString().trim();
-}
+/* ===== grouping ===== */
+function normalizeLOB(lobRaw){ return (lobRaw ?? "").toString().trim(); }
 function isParentRow(obj){
-  // Parent: LOB ends with "Grand Total" OR LOB equals "Grand Total"
   const lob = normalizeLOB(obj["LOB"]).toLowerCase();
   return lob === "grand total" || lob.endsWith(" grand total");
 }
 function getBaseLobFromRowObj(obj){
-  // For parent rows: strip trailing "Grand Total"; for child rows unchanged
   return normalizeLOB(obj["LOB"]).replace(/\s*grand total\s*$/i, "").trim();
 }
 function displayLobForParent(lobVal){
@@ -216,12 +252,12 @@ function displayLobForParent(lobVal){
   return raw.replace(/\s*grand total\s*$/i, "");
 }
 
-/* ===== Thresholds from thresholds.json ===== */
+/* ===== thresholds.json ===== */
 let THRESHOLDS = { serviceLevelMin: 80, otfMaxPercent: 100, lobs: {} };
 
 async function loadThresholds(){
   try{
-    const res = await fetch("./thresholds.json");
+    const res = await fetch(THRESHOLDS_URL, { cache: "no-store" });
     if(!res.ok) throw new Error("HTTP " + res.status);
     const json = await res.json();
 
@@ -271,19 +307,25 @@ function decorateThresholds(td, headerName, value, baseLobLower){
   }
 }
 
-/* ===== Table build ===== */
+/* ===== render ===== */
 let CURRENT_FILTER = "";
 
+async function fetchCSVText(url){
+  const res = await fetch(url, { cache: "no-store" });
+  if(!res.ok) throw new Error(`CSV fetch failed: HTTP ${res.status}`);
+  return await res.text();
+}
+
 async function loadAndRender(){
-  const res = await fetch("./SORA-Eff-Int.csv");
-  if(!res.ok) throw new Error("Failed to fetch CSV: " + res.status);
-  const text = await res.text();
+  // Fetch CSV from configured URL
+  const text = await fetchCSVText(DATA_CSV_URL);
 
   const raw = parseCSV(text);
   if(raw.length < 2) return;
 
   const HEADERS = raw[0].map(h => h.trim());
   const DISPLAY_HEADERS = HEADERS.map(h => (h === "Unnamed: 1" ? "Interval" : h));
+
   const rows = raw.slice(1).map(r => {
     const obj = {};
     HEADERS.forEach((h,i) => obj[h] = (r[i] ?? "").trim());
@@ -295,21 +337,23 @@ async function loadAndRender(){
 
   thead.innerHTML = "";
   const trh = document.createElement("tr");
-  DISPLAY_HEADERS.forEach(h => { const th=document.createElement("th"); th.textContent=h; trh.appendChild(th); });
+  DISPLAY_HEADERS.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    trh.appendChild(th);
+  });
   thead.appendChild(trh);
 
   tbody.innerHTML = "";
-
   let currentGroupId = null;
   let groupIndex = 0;
 
   for(const obj of rows){
     const parent = isParentRow(obj);
 
-    // If we see a child before any parent, start a dummy group so it doesn't break
     if(!parent && !currentGroupId){
+      // safety if file starts with child rows
       currentGroupId = `g${groupIndex++}`;
-      // (No parent row for this group; it will just show as ungrouped children)
     }
 
     const baseLob = getBaseLobFromRowObj(obj);
@@ -386,7 +430,7 @@ async function loadAndRender(){
   applyFilter("");
 }
 
-/* ===== Expand/collapse ===== */
+/* ===== expand/collapse ===== */
 function toggleGroup(groupId, forceExpand=null){
   const parentRow = document.querySelector(`tr.parent[data-group="${groupId}"]`);
   if(!parentRow) return;
@@ -399,9 +443,10 @@ function toggleGroup(groupId, forceExpand=null){
   children.forEach(tr => tr.classList.toggle("hidden", !willExpand));
 }
 
-/* ===== Filtering ===== */
+/* ===== filtering ===== */
 function applyFilter(q){
   CURRENT_FILTER = (q ?? "").toString().trim().toLowerCase();
+
   const parents = Array.from(document.querySelectorAll("tr.parent"));
   let shown = 0;
 
@@ -432,7 +477,6 @@ document.querySelector("#tbl tbody").addEventListener("click", (e) => {
   toggleGroup(parentRow.dataset.group);
   applyFilter(CURRENT_FILTER);
 });
-
 document.querySelector("#tbl tbody").addEventListener("keydown", (e) => {
   if(e.key !== "Enter" && e.key !== " ") return;
   const toggleCell = e.target.closest("td.lob-toggle");
@@ -444,7 +488,7 @@ document.querySelector("#tbl tbody").addEventListener("keydown", (e) => {
   applyFilter(CURRENT_FILTER);
 });
 
-/* ===== Controls ===== */
+/* ===== controls ===== */
 document.getElementById("expandAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, true));
   applyFilter(CURRENT_FILTER);
@@ -459,19 +503,35 @@ document.getElementById("clearSearch").addEventListener("click", () => {
   lobSearch.value=""; lobSearch.focus(); applyFilter("");
 });
 
-/* ===== Init ===== */
+/* ===== init ===== */
 (async function init(){
-  setSubtitleStamp();
+  await setSubtitleStampFromMeta();
   await loadThresholds();
-  await loadAndRender();
+
+  try{
+    await loadAndRender();
+  } catch(err){
+    console.error(err);
+    showError(
+`Could not load the CSV from SharePoint.
+
+This is expected if:
+- the link is a SharePoint/Excel share link (/:x:/) instead of a direct CSV URL, OR
+- authentication is required (Microsoft login), OR
+- SharePoint blocks cross-origin fetch (CORS) from GitHub Pages.
+
+Error:
+${err.message}
+
+Fix options:
+1) Host the CSV somewhere web-fetchable (Azure Blob, internal web server, etc.)
+2) Provide a true direct CSV endpoint with CORS enabled
+3) Use a small proxy (Azure Function) that fetches SharePoint and returns the CSV with CORS`
+    );
+  }
 })().catch(err => {
   console.error(err);
-  alert(
-    "Failed to load report. Confirm:\n" +
-    "1) index.html, SORA-Eff-Int.csv, thresholds.json are in the published folder\n" +
-    "2) filenames/case match exactly\n\n" +
-    "Error: " + err.message
-  );
+  showError("Init failed: " + err.message);
 })();
 </script>
 </body>
