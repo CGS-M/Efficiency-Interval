@@ -1,0 +1,13 @@
+{
+  "serviceLevelMin": 80,
+  "otfMaxPercent": 100,
+  "lobs": {
+    "ameriben - member": { "asaMax": 30, "ahtMax": 950 },
+    "ameriben - provider": { "asaMax": 30, "ahtMax": 720 },
+    "carelon behavioral health (beacon cc)": { "asaMax": 60, "ahtMax": 490 },
+    "carelon medical benefits management": { "asaMax": 30, "ahtMax": 480 },
+    "legacy behavioral health": { "asaMax": 45, "ahtMax": 620 },
+    "carelon subrogation": { "asaMax": 90, "ahtMax": 420 },
+    "carelon provider (cpcs)": { "asaMax": 60, "ahtMax": 420 }
+  }
+}
