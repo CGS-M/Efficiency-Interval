@@ -7,285 +7,82 @@
 
   <style>
     :root{
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --header: #0b1220;
-
-      --primary: #1d4ed8;
-      --primary-weak: rgba(29, 78, 216, 0.12);
-
-      --shadow-soft: 0 6px 16px rgba(2,6,23,.06);
-
-      --row-hover: #f1f5f9;
-      --row-alt: #fbfcff;
-      --sticky: #f8fafc;
-
-      --good: #16a34a;
-      --bad:  #dc2626;
-      --bad-bg: rgba(220,38,38,.08);
-      --good-bg: rgba(22,163,74,.08);
+      --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e2e8f0; --header:#0b1220;
+      --primary:#1d4ed8; --primary-weak:rgba(29,78,216,.12);
+      --shadow-soft:0 6px 16px rgba(2,6,23,.06);
+      --row-hover:#f1f5f9; --row-alt:#fbfcff; --sticky:#f8fafc;
+      --good:#16a34a; --bad:#dc2626; --bad-bg:rgba(220,38,38,.08); --good-bg:rgba(22,163,74,.08);
     }
-
-    * { box-sizing: border-box; }
-    body{
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      line-height: 1.4;
-    }
-
-    .page{
-      width: 80vw;
-      margin: 28px auto;
-      padding: 0 18px 28px;
-    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.4}
+    .page{width:80vw;margin:28px auto;padding:0 18px 28px}
 
     .topbar{
-      background: linear-gradient(180deg, rgba(29,78,216,.10), rgba(29,78,216,0));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px 18px 14px;
-      box-shadow: var(--shadow-soft);
+      background:linear-gradient(180deg, rgba(29,78,216,.10), rgba(29,78,216,0));
+      border:1px solid var(--border); border-radius:16px;
+      padding:18px 18px 14px; box-shadow:var(--shadow-soft);
     }
+    .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    h1{margin:0;font-size:18px;letter-spacing:.2px;color:var(--header)}
+    .subtitle{margin-top:6px;color:var(--muted);font-size:13px}
 
-    .title-row{
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.7);font-size:12px;color:var(--muted);white-space:nowrap}
+    .dot{width:9px;height:9px;border-radius:999px;background:var(--primary);box-shadow:0 0 0 4px var(--primary-weak)}
 
-    h1{
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: .2px;
-      color: var(--header);
-    }
+    .controls{margin-top:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .left-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .search{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.9);min-width:340px}
+    .search label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.2px}
+    .search input{flex:1;border:none;outline:none;font-size:13px;background:transparent;color:var(--text);min-width:160px}
+    .search:focus-within{border-color:rgba(29,78,216,.45);box-shadow:0 0 0 4px rgba(29,78,216,.12)}
 
-    .subtitle{
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
+    .btn{border:1px solid var(--border);background:#fff;padding:10px 12px;border-radius:12px;cursor:pointer;font-size:13px;color:var(--text);box-shadow:0 1px 0 rgba(2,6,23,.02)}
+    .btn:hover{background:#f8fafc}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{border-color:rgba(29,78,216,.35);background:rgba(29,78,216,.10);color:#0b2f9b}
+    .btn-primary:hover{background:rgba(29,78,216,.14)}
 
-    .pill{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255,255,255,.7);
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .dot{
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--primary);
-      box-shadow: 0 0 0 4px var(--primary-weak);
-    }
+    .right-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .stat{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.9);color:var(--muted);font-size:12px;white-space:nowrap}
+    .stat b{color:var(--text);font-weight:700}
 
-    .controls{
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .left-controls{
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .search{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.9);
-      min-width: 340px;
-    }
-    .search label{
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 600;
-      letter-spacing: .2px;
-    }
-    .search input{
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 13px;
-      background: transparent;
-      color: var(--text);
-      min-width: 160px;
-    }
-    .search:focus-within{
-      border-color: rgba(29,78,216,.45);
-      box-shadow: 0 0 0 4px rgba(29,78,216,.12);
-    }
-
-    .btn{
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 10px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 13px;
-      color: var(--text);
-      box-shadow: 0 1px 0 rgba(2,6,23,.02);
-    }
-    .btn:hover{ background: #f8fafc; }
-    .btn:active{ transform: translateY(1px); }
-
-    .btn-primary{
-      border-color: rgba(29,78,216,.35);
-      background: rgba(29,78,216,.10);
-      color: #0b2f9b;
-    }
-    .btn-primary:hover{ background: rgba(29,78,216,.14); }
-
-    .right-controls{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .stat{
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.9);
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .stat b{ color: var(--text); font-weight: 700; }
-
-    .table-card{
-      margin-top: 14px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow-soft);
-      overflow: hidden;
-    }
-
-    .table-wrap{
-      overflow: auto;
-      max-height: 74vh;
-    }
-
-    table{
-      border-collapse: separate;
-      border-spacing: 0;
-      width: 100%;
-      min-width: 1180px;
-    }
+    .table-card{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-soft);overflow:hidden}
+    .table-wrap{overflow:auto;max-height:74vh}
+    table{border-collapse:separate;border-spacing:0;width:100%;min-width:1180px}
 
     thead th{
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      background: var(--sticky);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      color: #0b1220;
-      text-align: left;
-      padding: 12px 12px;
-      white-space: nowrap;
-      letter-spacing: .15px;
+      position:sticky;top:0;z-index:5;background:var(--sticky);
+      border-bottom:1px solid var(--border);
+      font-size:12px;color:#0b1220;text-align:left;padding:12px 12px;white-space:nowrap;letter-spacing:.15px
     }
+    tbody td{border-bottom:1px solid var(--border);padding:10px 12px;font-size:13px;white-space:nowrap;vertical-align:middle;color:#0f172a}
+    tbody tr:nth-child(even){background:var(--row-alt)}
+    tbody tr:hover{background:var(--row-hover)}
 
-    tbody td{
-      border-bottom: 1px solid var(--border);
-      padding: 10px 12px;
-      font-size: 13px;
-      white-space: nowrap;
-      vertical-align: middle;
-      color: #0f172a;
-    }
+    tr.parent{background:#fff !important;font-weight:750}
+    tr.parent td{border-bottom:1px solid rgba(226,232,240,.9)}
 
-    tbody tr:nth-child(even){ background: var(--row-alt); }
-    tbody tr:hover{ background: var(--row-hover); }
-
-    tr.parent{
-      background: #fff !important;
-      font-weight: 750;
-    }
-    tr.parent td{
-      border-bottom: 1px solid rgba(226,232,240,.9);
-    }
-
-    td.lob-toggle{
-      cursor: pointer;
-      user-select: none;
-    }
-    td.lob-toggle:focus{
-      outline: none;
-      box-shadow: inset 0 0 0 2px rgba(29,78,216,.35);
-      border-radius: 8px;
-    }
-
-    .lob-cell{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    td.lob-toggle{cursor:pointer;user-select:none}
+    td.lob-toggle:focus{outline:none;box-shadow:inset 0 0 0 2px rgba(29,78,216,.35);border-radius:8px}
+    .lob-cell{display:flex;align-items:center;gap:10px}
     .chev{
-      width: 18px;
-      height: 18px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-      color: #0f172a;
-      font-size: 11px;
-      flex: 0 0 auto;
+      width:18px;height:18px;border-radius:8px;border:1px solid var(--border);
+      display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#0f172a;font-size:11px;flex:0 0 auto
     }
-    tr.parent[aria-expanded="true"] .chev::before{ content: "▼"; }
-    tr.parent[aria-expanded="false"] .chev::before{ content: "▶"; }
+    tr.parent[aria-expanded="true"] .chev::before{content:"▼"}
+    tr.parent[aria-expanded="false"] .chev::before{content:"▶"}
 
-    tr.child td:first-child{
-      padding-left: 44px;
-      color: #0f172a;
-      font-weight: 550;
-    }
-    tr.child.hidden{ display: none; }
+    tr.child td:first-child{padding-left:44px;color:#0f172a;font-weight:550}
+    tr.child.hidden{display:none}
+    tr.filtered-out{display:none !important}
 
-    tr.filtered-out{ display: none !important; }
+    .num{text-align:right;font-variant-numeric:tabular-nums;color:#0b1220}
+    td.kpi{font-weight:750}
+    td.kpi.good{color:var(--good);background:var(--good-bg)}
+    td.kpi.bad{color:var(--bad);background:var(--bad-bg)}
 
-    .num{
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      color: #0b1220;
-    }
-
-    /* Threshold highlighting (only for configured KPIs) */
-    td.kpi { font-weight: 750; }
-    td.kpi.good { color: var(--good); background: var(--good-bg); }
-    td.kpi.bad  { color: var(--bad);  background: var(--bad-bg); }
-
-    thead th:first-child { border-top-left-radius: 16px; }
-    thead th:last-child  { border-top-right-radius: 16px; }
+    thead th:first-child{border-top-left-radius:16px}
+    thead th:last-child{border-top-right-radius:16px}
   </style>
 </head>
 
@@ -295,9 +92,7 @@
       <div class="title-row">
         <div>
           <h1>CS+ Efficiency Interval Report</h1>
-          <div class="subtitle">
-            day, <span id="reportStamp">Loading…</span>
-          </div>
+          <div class="subtitle">day, <span id="reportStamp">Loading…</span></div>
         </div>
         <div class="pill" title="Data source loaded from SORA-Eff-Int.csv">
           <span class="dot"></span>
@@ -334,29 +129,21 @@
   </div>
 
 <script>
-/* ===================== Subtitle stamp ======================= */
-function formatDateLong(d){
-  return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "2-digit" });
-}
-function formatTimeOnly(d){
-  return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-}
+/* ===== Subtitle stamp ===== */
+function formatDateLong(d){ return d.toLocaleDateString(undefined, {year:"numeric",month:"long",day:"2-digit"}); }
+function formatTimeOnly(d){ return d.toLocaleTimeString(undefined, {hour:"numeric",minute:"2-digit"}); }
 function getAsOfTimeFromQuery(){
-  const params = new URLSearchParams(location.search);
-  const asof = (params.get("asof") || "").trim();  // HH:MM
-  if (/^\d{1,2}:\d{2}$/.test(asof)) return asof;
-  return null;
+  const asof = (new URLSearchParams(location.search).get("asof") || "").trim();
+  return /^\d{1,2}:\d{2}$/.test(asof) ? asof : null;
 }
 function setSubtitleStamp(){
   const el = document.getElementById("reportStamp");
   if(!el) return;
-
   const now = new Date();
   const dateText = formatDateLong(now);
-
   const asof = getAsOfTimeFromQuery();
   let timeText;
-  if (asof) {
+  if(asof){
     const [hh, mm] = asof.split(":").map(Number);
     const d = new Date(now);
     d.setHours(hh, mm, 0, 0);
@@ -367,7 +154,7 @@ function setSubtitleStamp(){
   el.textContent = `${dateText} — as of ${timeText}`;
 }
 
-/* ---------------- CSV parsing (supports quotes) ---------------- */
+/* ===== CSV parsing ===== */
 function parseCSV(text){
   const rows=[]; let row=[]; let cur=""; let inQuotes=false;
   for(let i=0;i<text.length;i++){
@@ -380,15 +167,13 @@ function parseCSV(text){
     } else if((ch === '\n' || ch === '\r') && !inQuotes){
       if(ch === '\r' && next === '\n') i++;
       row.push(cur); cur="";
-      if(row.some(v => v.trim() !== "")) rows.push(row);
+      if(row.some(v=>v.trim()!=="")) rows.push(row);
       row=[];
-    } else {
-      cur += ch;
-    }
+    } else cur += ch;
   }
   if(cur.length || row.length){
     row.push(cur);
-    if(row.some(v => v.trim() !== "")) rows.push(row);
+    if(row.some(v=>v.trim()!=="")) rows.push(row);
   }
   return rows;
 }
@@ -412,56 +197,40 @@ function formatCell(v, headerName){
   return v;
 }
 
-/* ---------------- Group logic for SORA-Eff-Int.csv ---------------- */
+/* ===== Group logic (robust for your CSV) ===== */
+function normalizeLOB(lobRaw){
+  return (lobRaw ?? "").toString().trim();
+}
 function isParentRow(obj){
-  const lob=(obj["LOB"]??"").toString().trim().toLowerCase();
-  return lob === "grand total" || lob.endsWith(" grand total") || lob.endsWith("grand total");
+  // Parent: LOB ends with "Grand Total" OR LOB equals "Grand Total"
+  const lob = normalizeLOB(obj["LOB"]).toLowerCase();
+  return lob === "grand total" || lob.endsWith(" grand total");
+}
+function getBaseLobFromRowObj(obj){
+  // For parent rows: strip trailing "Grand Total"; for child rows unchanged
+  return normalizeLOB(obj["LOB"]).replace(/\s*grand total\s*$/i, "").trim();
 }
 function displayLobForParent(lobVal){
-  const raw = (lobVal ?? "").toString().trim();
+  const raw = normalizeLOB(lobVal);
   if(raw.toLowerCase() === "grand total") return "Grand Total";
   return raw.replace(/\s*grand total\s*$/i, "");
 }
-function getBaseLobFromRowObj(obj){
-  const lobRaw = (obj["LOB"] ?? "").toString().trim();
-  return lobRaw.replace(/\s*grand total\s*$/i, "").trim();
-}
 
-/* ===================== Thresholds (loaded from JSON) =====================
-
-Create a file in your repo:
-  thresholds.json
-
-Example:
-{
-  "serviceLevelMin": 80,
-  "otfMaxPercent": 100,
-  "lobs": {
-    "ameriben - member": { "asaMax": 30, "ahtMax": 950 },
-    "ameriben - provider": { "asaMax": 30, "ahtMax": 720 }
-  }
-}
-
-============================================================================ */
-let THRESHOLDS = {
-  serviceLevelMin: 80,
-  otfMaxPercent: 100,
-  lobs: {}
-};
+/* ===== Thresholds from thresholds.json ===== */
+let THRESHOLDS = { serviceLevelMin: 80, otfMaxPercent: 100, lobs: {} };
 
 async function loadThresholds(){
-  try {
+  try{
     const res = await fetch("./thresholds.json");
     if(!res.ok) throw new Error("HTTP " + res.status);
     const json = await res.json();
 
-    // minimal validation / defaults
     THRESHOLDS.serviceLevelMin = Number.isFinite(Number(json.serviceLevelMin)) ? Number(json.serviceLevelMin) : 80;
     THRESHOLDS.otfMaxPercent = Number.isFinite(Number(json.otfMaxPercent)) ? Number(json.otfMaxPercent) : 100;
 
     THRESHOLDS.lobs = {};
-    if (json.lobs && typeof json.lobs === "object") {
-      for (const [k, v] of Object.entries(json.lobs)) {
+    if(json.lobs && typeof json.lobs === "object"){
+      for(const [k,v] of Object.entries(json.lobs)){
         const key = k.toLowerCase().trim();
         THRESHOLDS.lobs[key] = {
           asaMax: Number.isFinite(Number(v.asaMax)) ? Number(v.asaMax) : null,
@@ -469,55 +238,42 @@ async function loadThresholds(){
         };
       }
     }
-  } catch (e) {
-    console.warn("Could not load thresholds.json. Using defaults (no per-LOB thresholds).", e);
+  } catch(e){
+    console.warn("thresholds.json not loaded. Using defaults.", e);
   }
 }
 
-/* Apply threshold styles ONLY for configured KPIs */
 function decorateThresholds(td, headerName, value, baseLobLower){
-  // Service Level%
-  if (headerName === "Service Level%") {
-    if (typeof value !== "number") return;
+  if(headerName === "Service Level%"){
+    if(typeof value !== "number") return;
     td.classList.add("kpi");
     td.classList.add(value >= THRESHOLDS.serviceLevelMin ? "good" : "bad");
     return;
   }
-
-  // ASA (secs) - per LOB
-  if (headerName === "ASA (secs)") {
+  if(headerName === "ASA (secs)"){
     const cfg = THRESHOLDS.lobs[baseLobLower];
-    if (!cfg || typeof value !== "number" || cfg.asaMax == null) return;
+    if(!cfg || cfg.asaMax == null || typeof value !== "number") return;
     td.classList.add("kpi");
     td.classList.add(value <= cfg.asaMax ? "good" : "bad");
     return;
   }
-
-  // Sum of OTF. - all LOBs: red if > otfMaxPercent
-  if (headerName === "Sum of OTF.") {
-    if (typeof value !== "number") return;
-    if (value > THRESHOLDS.otfMaxPercent) {
-      td.classList.add("kpi", "bad");
-    }
+  if(headerName === "Sum of OTF."){
+    if(typeof value !== "number") return;
+    if(value > THRESHOLDS.otfMaxPercent) td.classList.add("kpi","bad");
     return;
   }
-
-  // Sum of AHT. - per LOB
-  if (headerName === "Sum of AHT.") {
+  if(headerName === "Sum of AHT."){
     const cfg = THRESHOLDS.lobs[baseLobLower];
-    if (!cfg || typeof value !== "number" || cfg.ahtMax == null) return;
+    if(!cfg || cfg.ahtMax == null || typeof value !== "number") return;
     td.classList.add("kpi");
     td.classList.add(value <= cfg.ahtMax ? "good" : "bad");
     return;
   }
 }
 
-/* ---------------- State ---------------- */
+/* ===== Table build ===== */
 let CURRENT_FILTER = "";
-let HEADERS = [];
-let DISPLAY_HEADERS = [];
 
-/* ---------------- Render ---------------- */
 async function loadAndRender(){
   const res = await fetch("./SORA-Eff-Int.csv");
   if(!res.ok) throw new Error("Failed to fetch CSV: " + res.status);
@@ -526,9 +282,8 @@ async function loadAndRender(){
   const raw = parseCSV(text);
   if(raw.length < 2) return;
 
-  HEADERS = raw[0].map(h => h.trim());
-  DISPLAY_HEADERS = HEADERS.map(h => (h === "Unnamed: 1" ? "Interval" : h));
-
+  const HEADERS = raw[0].map(h => h.trim());
+  const DISPLAY_HEADERS = HEADERS.map(h => (h === "Unnamed: 1" ? "Interval" : h));
   const rows = raw.slice(1).map(r => {
     const obj = {};
     HEADERS.forEach((h,i) => obj[h] = (r[i] ?? "").trim());
@@ -538,23 +293,24 @@ async function loadAndRender(){
   const thead = document.querySelector("#tbl thead");
   const tbody = document.querySelector("#tbl tbody");
 
-  // header
   thead.innerHTML = "";
   const trh = document.createElement("tr");
-  DISPLAY_HEADERS.forEach(h => {
-    const th = document.createElement("th");
-    th.textContent = h;
-    trh.appendChild(th);
-  });
+  DISPLAY_HEADERS.forEach(h => { const th=document.createElement("th"); th.textContent=h; trh.appendChild(th); });
   thead.appendChild(trh);
 
-  // body
   tbody.innerHTML = "";
+
   let currentGroupId = null;
   let groupIndex = 0;
 
   for(const obj of rows){
     const parent = isParentRow(obj);
+
+    // If we see a child before any parent, start a dummy group so it doesn't break
+    if(!parent && !currentGroupId){
+      currentGroupId = `g${groupIndex++}`;
+      // (No parent row for this group; it will just show as ungrouped children)
+    }
 
     const baseLob = getBaseLobFromRowObj(obj);
     const baseLobLower = baseLob.toLowerCase();
@@ -609,16 +365,14 @@ async function loadAndRender(){
     } else {
       const tr = document.createElement("tr");
       tr.className = "child";
-      tr.dataset.parent = currentGroupId || "";
+      tr.dataset.parent = currentGroupId;
 
       HEADERS.forEach((h,i) => {
         const td = document.createElement("td");
-
         const val = toNumberMaybe(obj[h]);
         td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
         if(typeof val === "number") td.classList.add("num");
         decorateThresholds(td, h, val, baseLobLower);
-
         tr.appendChild(td);
       });
 
@@ -626,102 +380,89 @@ async function loadAndRender(){
     }
   }
 
-  // counts
   document.getElementById("lobCountTotal").textContent =
     document.querySelectorAll("tr.parent").length.toString();
 
   applyFilter("");
 }
 
-/* ---------------- Expand/Collapse ---------------- */
+/* ===== Expand/collapse ===== */
 function toggleGroup(groupId, forceExpand=null){
   const parentRow = document.querySelector(`tr.parent[data-group="${groupId}"]`);
   if(!parentRow) return;
 
   const children = Array.from(document.querySelectorAll(`tr.child[data-parent="${groupId}"]`));
   const expandedNow = parentRow.getAttribute("aria-expanded") === "true";
-  const willExpand = (forceExpand === null) ? !expandedNow : !!forceExpand;
+  const willExpand = (forceExpand===null) ? !expandedNow : !!forceExpand;
 
   parentRow.setAttribute("aria-expanded", willExpand ? "true" : "false");
   children.forEach(tr => tr.classList.toggle("hidden", !willExpand));
 }
 
-/* ---------------- Filter (Search) ---------------- */
+/* ===== Filtering ===== */
 function applyFilter(q){
   CURRENT_FILTER = (q ?? "").toString().trim().toLowerCase();
-
   const parents = Array.from(document.querySelectorAll("tr.parent"));
   let shown = 0;
 
   for(const p of parents){
-    const matches = CURRENT_FILTER === "" || (p.dataset.lobLower || "").includes(CURRENT_FILTER);
+    const matches = CURRENT_FILTER==="" || (p.dataset.lobLower||"").includes(CURRENT_FILTER);
     p.classList.toggle("filtered-out", !matches);
     if(matches) shown++;
 
     const gid = p.dataset.group;
-    const expanded = p.getAttribute("aria-expanded") === "true";
+    const expanded = p.getAttribute("aria-expanded")==="true";
     const children = Array.from(document.querySelectorAll(`tr.child[data-parent="${gid}"]`));
 
     const showChildren = matches && expanded;
-    for(const c of children){
+    children.forEach(c => {
       c.classList.toggle("filtered-out", !matches);
       c.classList.toggle("hidden", !showChildren);
-    }
+    });
   }
-
   document.getElementById("lobCountShown").textContent = shown.toString();
 }
 
-/* ---------------- Edge-safe Event Delegation ---------------- */
+/* ===== Edge-safe delegation toggle ===== */
 document.querySelector("#tbl tbody").addEventListener("click", (e) => {
   const toggleCell = e.target.closest("td.lob-toggle");
   if(!toggleCell) return;
-
   const parentRow = toggleCell.closest("tr.parent");
   if(!parentRow) return;
-
   toggleGroup(parentRow.dataset.group);
   applyFilter(CURRENT_FILTER);
 });
 
 document.querySelector("#tbl tbody").addEventListener("keydown", (e) => {
   if(e.key !== "Enter" && e.key !== " ") return;
-
   const toggleCell = e.target.closest("td.lob-toggle");
   if(!toggleCell) return;
-
   const parentRow = toggleCell.closest("tr.parent");
   if(!parentRow) return;
-
   e.preventDefault();
   toggleGroup(parentRow.dataset.group);
   applyFilter(CURRENT_FILTER);
 });
 
-/* ---------------- Controls ---------------- */
+/* ===== Controls ===== */
 document.getElementById("expandAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, true));
   applyFilter(CURRENT_FILTER);
 });
-
 document.getElementById("collapseAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
   applyFilter(CURRENT_FILTER);
 });
-
 const lobSearch = document.getElementById("lobSearch");
 lobSearch.addEventListener("input", () => applyFilter(lobSearch.value));
-
 document.getElementById("clearSearch").addEventListener("click", () => {
-  lobSearch.value = "";
-  lobSearch.focus();
-  applyFilter("");
+  lobSearch.value=""; lobSearch.focus(); applyFilter("");
 });
 
-/* ---------------- Load (thresholds -> render) ---------------- */
+/* ===== Init ===== */
 (async function init(){
   setSubtitleStamp();
-  await loadThresholds();   // loads thresholds.json if present
+  await loadThresholds();
   await loadAndRender();
 })().catch(err => {
   console.error(err);
