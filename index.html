@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SORA Efficiency by Interval</title>
+  <title>Carelon Services + Efficiency Interval Report</title>
 
   <style>
     :root{
@@ -38,8 +38,9 @@
       line-height: 1.4;
     }
 
+    /* 80% of screen width, centered */
     .page{
-      max-width: 80vw;
+      width: 80vw;
       margin: 28px auto;
       padding: 0 18px 28px;
     }
@@ -307,11 +308,14 @@
     <div class="topbar">
       <div class="title-row">
         <div>
-          <h1>SORA Efficiency by Interval</h1>
+          <h1>CS+ Efficiency Interval Report</h1>
+
+          <!-- Subtitle updated: "day, [DATE Today] — as of [time]" -->
           <div class="subtitle">
-            Collapsible LOB totals with interval detail. Search to isolate one LOB quickly.
+            day, <span id="reportStamp">Loading…</span>
           </div>
         </div>
+
         <div class="pill" title="Data source loaded from SORA-Eff-Int.csv">
           <span class="dot"></span>
           <span>Source: <b>SORA-Eff-Int.csv</b></span>
@@ -351,6 +355,50 @@
   </div>
 
 <script>
+/* ===================== Subtitle stamp =======================
+   Goal: "day, [DATE Today] — as of [time committed]"
+   Since GitHub Pages is static, we can't automatically know git commit time
+   without calling the GitHub API. So we allow passing the "as of" time via URL:
+
+   Example:
+     index.html?asof=17:30
+
+   If not provided, we fall back to the viewer's current time.
+============================================================== */
+function formatDateLong(d){
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "2-digit" });
+}
+function formatTimeOnly(d){
+  return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+}
+function getAsOfTimeFromQuery(){
+  const params = new URLSearchParams(location.search);
+  const asof = (params.get("asof") || "").trim();  // expects HH:MM (24h)
+  if (/^\d{1,2}:\d{2}$/.test(asof)) return asof;
+  return null;
+}
+function setSubtitleStamp(){
+  const el = document.getElementById("reportStamp");
+  if(!el) return;
+
+  const now = new Date();
+  const dateText = formatDateLong(now);
+
+  const asof = getAsOfTimeFromQuery();
+  let timeText;
+
+  if (asof) {
+    const [hh, mm] = asof.split(":").map(Number);
+    const d = new Date(now);
+    d.setHours(hh, mm, 0, 0);
+    timeText = formatTimeOnly(d);
+  } else {
+    timeText = formatTimeOnly(now);
+  }
+
+  el.textContent = `${dateText} — as of ${timeText}`;
+}
+
 /* ---------------- CSV parsing (supports quotes) ---------------- */
 function parseCSV(text){
   const rows=[]; let row=[]; let cur=""; let inQuotes=false;
@@ -402,8 +450,10 @@ function isParentRow(obj){
   const lob=(obj["LOB"]??"").toString().trim().toLowerCase();
   return lob === "grand total" || lob.endsWith(" grand total") || lob.endsWith("grand total");
 }
-function baseLobName(lobVal){
-  return (lobVal??"").toString().trim().replace(/\s*grand total\s*$/i,"");
+function displayLobForParent(lobVal){
+  const raw = (lobVal ?? "").toString().trim();
+  if(raw.toLowerCase() === "grand total") return "Grand Total";
+  return raw.replace(/\s*grand total\s*$/i, "");
 }
 
 /* ---------------- State ---------------- */
@@ -413,21 +463,18 @@ let DISPLAY_HEADERS = [];
 
 /* ---------------- KPI coloring (optional) ---------------- */
 function classifyServiceLevel(percentNumber){
-  // Adjust thresholds as you like:
   if(!Number.isFinite(percentNumber)) return null;
   if(percentNumber >= 95) return "good";
   if(percentNumber >= 85) return "warn";
   return "bad";
 }
 function classifyABN(percentNumber){
-  // lower is better
   if(!Number.isFinite(percentNumber)) return null;
   if(percentNumber <= 1) return "good";
   if(percentNumber <= 3) return "warn";
   return "bad";
 }
 function classifyASA(secondsNumber){
-  // lower is better (example thresholds)
   if(!Number.isFinite(secondsNumber)) return null;
   if(secondsNumber <= 10) return "good";
   if(secondsNumber <= 30) return "warn";
@@ -475,13 +522,15 @@ async function loadAndRender(){
 
     if(parent){
       currentGroupId = `g${groupIndex++}`;
-      const lobBase = baseLobName(obj["LOB"] || "");
+
+      const lobDisplay = displayLobForParent(obj["LOB"] || "");
+      const lobLower = lobDisplay.toLowerCase();
 
       const tr = document.createElement("tr");
       tr.className = "parent";
       tr.dataset.group = currentGroupId;
-      tr.dataset.lob = lobBase;
-      tr.dataset.lobLower = lobBase.toLowerCase();
+      tr.dataset.lob = lobDisplay;
+      tr.dataset.lobLower = lobLower;
       tr.setAttribute("aria-expanded","true");
 
       HEADERS.forEach((h,i) => {
@@ -498,7 +547,7 @@ async function loadAndRender(){
           chev.className = "chev";
 
           const label = document.createElement("span");
-          label.textContent = lobBase || "(blank)";
+          label.textContent = lobDisplay || "(blank)";
 
           wrap.appendChild(chev);
           wrap.appendChild(label);
@@ -546,8 +595,6 @@ async function loadAndRender(){
 }
 
 function decorateKPICell(td, header, val){
-  // Add subtle KPI coloring for a few fields (optional).
-  // header names are from the CSV (not display headers).
   if(header === "Service Level%"){
     td.classList.add("kpi");
     const cls = classifyServiceLevel(val);
@@ -651,6 +698,7 @@ document.getElementById("clearSearch").addEventListener("click", () => {
 });
 
 /* ---------------- Load ---------------- */
+setSubtitleStamp();     // <--- sets: "day, March 24, 2026 — as of 5:30 PM"
 loadAndRender().catch(err => {
   console.error(err);
   alert(
