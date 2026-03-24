@@ -1,5 +1,5 @@
-﻿LOB,,Forecasted Calls,Offered Calls,Answered Calls,Service Level%,ASA (secs),ABN%,Sum of OTF.,Sum of AHT.,Sum of Occ.,Staffing OU,Sum of Met SLA
-Carelon Behavioral Health (Beacon CC) Grand Total,Interval,1532,1550,1543,97.02%,9,0.45%,101.19%,407,62.44%,0,1498
+﻿LOB,Interval,Forecasted Calls,Offered Calls,Answered Calls,Service Level%,ASA (secs),ABN%,Sum of OTF.,Sum of AHT.,Sum of Occ.,Staffing OU,Sum of Met SLA
+Carelon Behavioral Health (Beacon CC) Grand Total,,1532,1550,1543,97.02%,9,0.45%,101.19%,407,62.44%,0,1498
 Carelon Behavioral Health (Beacon CC),08:00,18,16,16,93.75%,13,0.00%,88.89%,267,15.15%,0,15
 Carelon Behavioral Health (Beacon CC),08:30,30,29,28,96.55%,8,0.00%,97.97%,295,26.91%,0,28
 Carelon Behavioral Health (Beacon CC),09:00,46,42,43,97.62%,9,0.00%,90.46%,380,27.60%,0,41
