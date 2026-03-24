@@ -17,7 +17,6 @@
       --primary: #1d4ed8;
       --primary-weak: rgba(29, 78, 216, 0.12);
 
-      --shadow: 0 10px 25px rgba(2,6,23,.08);
       --shadow-soft: 0 6px 16px rgba(2,6,23,.06);
 
       --row-hover: #f1f5f9;
@@ -25,8 +24,9 @@
       --sticky: #f8fafc;
 
       --good: #16a34a;
-      --warn: #f59e0b;
       --bad:  #dc2626;
+      --bad-bg: rgba(220,38,38,.08);
+      --good-bg: rgba(22,163,74,.08);
     }
 
     * { box-sizing: border-box; }
@@ -38,7 +38,6 @@
       line-height: 1.4;
     }
 
-    /* 80% of screen width, centered */
     .page{
       width: 80vw;
       margin: 28px auto;
@@ -184,7 +183,7 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-soft);
       overflow: hidden;
     }
 
@@ -226,7 +225,6 @@
     tbody tr:nth-child(even){ background: var(--row-alt); }
     tbody tr:hover{ background: var(--row-hover); }
 
-    /* Parent row styling */
     tr.parent{
       background: #fff !important;
       font-weight: 750;
@@ -266,7 +264,6 @@
     tr.parent[aria-expanded="true"] .chev::before{ content: "▼"; }
     tr.parent[aria-expanded="false"] .chev::before{ content: "▶"; }
 
-    /* Child rows */
     tr.child td:first-child{
       padding-left: 44px;
       color: #0f172a;
@@ -274,32 +271,21 @@
     }
     tr.child.hidden{ display: none; }
 
-    /* Filtering */
     tr.filtered-out{ display: none !important; }
 
-    /* Numbers */
     .num{
       text-align: right;
       font-variant-numeric: tabular-nums;
       color: #0b1220;
     }
 
-    /* Optional: small visual emphasis for key metrics (Service Level / ASA / ABN) */
-    td.kpi { font-weight: 650; }
-    td.kpi.good { color: var(--good); }
-    td.kpi.warn { color: var(--warn); }
-    td.kpi.bad  { color: var(--bad); }
+    /* Threshold highlighting (only for configured KPIs) */
+    td.kpi { font-weight: 750; }
+    td.kpi.good { color: var(--good); background: var(--good-bg); }
+    td.kpi.bad  { color: var(--bad);  background: var(--bad-bg); }
 
-    /* Corner rounding for sticky header */
     thead th:first-child { border-top-left-radius: 16px; }
     thead th:last-child  { border-top-right-radius: 16px; }
-
-    .footer-note{
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 0 4px;
-    }
   </style>
 </head>
 
@@ -309,13 +295,10 @@
       <div class="title-row">
         <div>
           <h1>CS+ Efficiency Interval Report</h1>
-
-          <!-- Subtitle updated: "day, [DATE Today] — as of [time]" -->
           <div class="subtitle">
-            Update: <span id="reportStamp">Loading…</span>
+            day, <span id="reportStamp">Loading…</span>
           </div>
         </div>
-
         <div class="pill" title="Data source loaded from SORA-Eff-Int.csv">
           <span class="dot"></span>
           <span>Source: <b>SORA-Eff-Int.csv</b></span>
@@ -348,23 +331,10 @@
         </table>
       </div>
     </div>
-
-    <div class="footer-note">
-      Tip: click the LOB name (first column) on a total row to expand/collapse. Use “Expand all” after searching to view all intervals for matching LOBs.
-    </div>
   </div>
 
 <script>
-/* ===================== Subtitle stamp =======================
-   Goal: "day, [DATE Today] — as of [time committed]"
-   Since GitHub Pages is static, we can't automatically know git commit time
-   without calling the GitHub API. So we allow passing the "as of" time via URL:
-
-   Example:
-     index.html?asof=17:30
-
-   If not provided, we fall back to the viewer's current time.
-============================================================== */
+/* ===================== Subtitle stamp ======================= */
 function formatDateLong(d){
   return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "2-digit" });
 }
@@ -373,7 +343,7 @@ function formatTimeOnly(d){
 }
 function getAsOfTimeFromQuery(){
   const params = new URLSearchParams(location.search);
-  const asof = (params.get("asof") || "").trim();  // expects HH:MM (24h)
+  const asof = (params.get("asof") || "").trim();  // HH:MM
   if (/^\d{1,2}:\d{2}$/.test(asof)) return asof;
   return null;
 }
@@ -386,7 +356,6 @@ function setSubtitleStamp(){
 
   const asof = getAsOfTimeFromQuery();
   let timeText;
-
   if (asof) {
     const [hh, mm] = asof.split(":").map(Number);
     const d = new Date(now);
@@ -395,7 +364,6 @@ function setSubtitleStamp(){
   } else {
     timeText = formatTimeOnly(now);
   }
-
   el.textContent = `${dateText} — as of ${timeText}`;
 }
 
@@ -435,7 +403,6 @@ function toNumberMaybe(v){
   const n=Number(s);
   return Number.isFinite(n) ? n : s;
 }
-
 function formatCell(v, headerName){
   if(typeof v === "number"){
     if(headerName.includes("%")) return v.toFixed(2) + "%";
@@ -455,31 +422,100 @@ function displayLobForParent(lobVal){
   if(raw.toLowerCase() === "grand total") return "Grand Total";
   return raw.replace(/\s*grand total\s*$/i, "");
 }
+function getBaseLobFromRowObj(obj){
+  const lobRaw = (obj["LOB"] ?? "").toString().trim();
+  return lobRaw.replace(/\s*grand total\s*$/i, "").trim();
+}
+
+/* ===================== Thresholds (loaded from JSON) =====================
+
+Create a file in your repo:
+  thresholds.json
+
+Example:
+{
+  "serviceLevelMin": 80,
+  "otfMaxPercent": 100,
+  "lobs": {
+    "ameriben - member": { "asaMax": 30, "ahtMax": 950 },
+    "ameriben - provider": { "asaMax": 30, "ahtMax": 720 }
+  }
+}
+
+============================================================================ */
+let THRESHOLDS = {
+  serviceLevelMin: 80,
+  otfMaxPercent: 100,
+  lobs: {}
+};
+
+async function loadThresholds(){
+  try {
+    const res = await fetch("./thresholds.json");
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+
+    // minimal validation / defaults
+    THRESHOLDS.serviceLevelMin = Number.isFinite(Number(json.serviceLevelMin)) ? Number(json.serviceLevelMin) : 80;
+    THRESHOLDS.otfMaxPercent = Number.isFinite(Number(json.otfMaxPercent)) ? Number(json.otfMaxPercent) : 100;
+
+    THRESHOLDS.lobs = {};
+    if (json.lobs && typeof json.lobs === "object") {
+      for (const [k, v] of Object.entries(json.lobs)) {
+        const key = k.toLowerCase().trim();
+        THRESHOLDS.lobs[key] = {
+          asaMax: Number.isFinite(Number(v.asaMax)) ? Number(v.asaMax) : null,
+          ahtMax: Number.isFinite(Number(v.ahtMax)) ? Number(v.ahtMax) : null
+        };
+      }
+    }
+  } catch (e) {
+    console.warn("Could not load thresholds.json. Using defaults (no per-LOB thresholds).", e);
+  }
+}
+
+/* Apply threshold styles ONLY for configured KPIs */
+function decorateThresholds(td, headerName, value, baseLobLower){
+  // Service Level%
+  if (headerName === "Service Level%") {
+    if (typeof value !== "number") return;
+    td.classList.add("kpi");
+    td.classList.add(value >= THRESHOLDS.serviceLevelMin ? "good" : "bad");
+    return;
+  }
+
+  // ASA (secs) - per LOB
+  if (headerName === "ASA (secs)") {
+    const cfg = THRESHOLDS.lobs[baseLobLower];
+    if (!cfg || typeof value !== "number" || cfg.asaMax == null) return;
+    td.classList.add("kpi");
+    td.classList.add(value <= cfg.asaMax ? "good" : "bad");
+    return;
+  }
+
+  // Sum of OTF. - all LOBs: red if > otfMaxPercent
+  if (headerName === "Sum of OTF.") {
+    if (typeof value !== "number") return;
+    if (value > THRESHOLDS.otfMaxPercent) {
+      td.classList.add("kpi", "bad");
+    }
+    return;
+  }
+
+  // Sum of AHT. - per LOB
+  if (headerName === "Sum of AHT.") {
+    const cfg = THRESHOLDS.lobs[baseLobLower];
+    if (!cfg || typeof value !== "number" || cfg.ahtMax == null) return;
+    td.classList.add("kpi");
+    td.classList.add(value <= cfg.ahtMax ? "good" : "bad");
+    return;
+  }
+}
 
 /* ---------------- State ---------------- */
 let CURRENT_FILTER = "";
 let HEADERS = [];
 let DISPLAY_HEADERS = [];
-
-/* ---------------- KPI coloring (optional) ---------------- */
-function classifyServiceLevel(percentNumber){
-  if(!Number.isFinite(percentNumber)) return null;
-  if(percentNumber >= 95) return "good";
-  if(percentNumber >= 85) return "warn";
-  return "bad";
-}
-function classifyABN(percentNumber){
-  if(!Number.isFinite(percentNumber)) return null;
-  if(percentNumber <= 1) return "good";
-  if(percentNumber <= 3) return "warn";
-  return "bad";
-}
-function classifyASA(secondsNumber){
-  if(!Number.isFinite(secondsNumber)) return null;
-  if(secondsNumber <= 10) return "good";
-  if(secondsNumber <= 30) return "warn";
-  return "bad";
-}
 
 /* ---------------- Render ---------------- */
 async function loadAndRender(){
@@ -520,6 +556,9 @@ async function loadAndRender(){
   for(const obj of rows){
     const parent = isParentRow(obj);
 
+    const baseLob = getBaseLobFromRowObj(obj);
+    const baseLobLower = baseLob.toLowerCase();
+
     if(parent){
       currentGroupId = `g${groupIndex++}`;
 
@@ -559,7 +598,7 @@ async function loadAndRender(){
           const val = toNumberMaybe(obj[h]);
           td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
           if(typeof val === "number") td.classList.add("num");
-          decorateKPICell(td, h, val);
+          decorateThresholds(td, h, val, baseLobLower);
         }
 
         tr.appendChild(td);
@@ -578,7 +617,7 @@ async function loadAndRender(){
         const val = toNumberMaybe(obj[h]);
         td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
         if(typeof val === "number") td.classList.add("num");
-        decorateKPICell(td, h, val);
+        decorateThresholds(td, h, val, baseLobLower);
 
         tr.appendChild(td);
       });
@@ -592,24 +631,6 @@ async function loadAndRender(){
     document.querySelectorAll("tr.parent").length.toString();
 
   applyFilter("");
-}
-
-function decorateKPICell(td, header, val){
-  if(header === "Service Level%"){
-    td.classList.add("kpi");
-    const cls = classifyServiceLevel(val);
-    if(cls) td.classList.add(cls);
-  }
-  if(header === "ABN%"){
-    td.classList.add("kpi");
-    const cls = classifyABN(val);
-    if(cls) td.classList.add(cls);
-  }
-  if(header === "ASA (secs)"){
-    td.classList.add("kpi");
-    const cls = classifyASA(val);
-    if(cls) td.classList.add(cls);
-  }
 }
 
 /* ---------------- Expand/Collapse ---------------- */
@@ -697,18 +718,20 @@ document.getElementById("clearSearch").addEventListener("click", () => {
   applyFilter("");
 });
 
-/* ---------------- Load ---------------- */
-setSubtitleStamp();     // <--- sets: "day, March 24, 2026 — as of 5:30 PM"
-loadAndRender().catch(err => {
+/* ---------------- Load (thresholds -> render) ---------------- */
+(async function init(){
+  setSubtitleStamp();
+  await loadThresholds();   // loads thresholds.json if present
+  await loadAndRender();
+})().catch(err => {
   console.error(err);
   alert(
-    "Failed to load CSV. For GitHub Pages, confirm:\n" +
-    "1) GitHub Pages is enabled\n" +
-    "2) index.html and SORA-Eff-Int.csv are in the published folder\n" +
-    "3) the CSV filename/case matches exactly\n\n" +
+    "Failed to load report. Confirm:\n" +
+    "1) index.html, SORA-Eff-Int.csv, thresholds.json are in the published folder\n" +
+    "2) filenames/case match exactly\n\n" +
     "Error: " + err.message
   );
-});
+})();
 </script>
 </body>
 </html>
