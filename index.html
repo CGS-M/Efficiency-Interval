@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SORA Eff Int - Carelon Services +</title>
+  <title>SORA Eff Int - Collapsible Table</title>
   <style>
     :root {
       --border: #e5e7eb;
@@ -12,13 +12,37 @@
       --bg: #ffffff;
       --bg2: #f9fafb;
       --hover: #f3f4f6;
+      --focus: #2563eb;
     }
 
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); margin: 24px; color: #111; }
-    h1 { margin: 0 0 12px; font-size: 18px; color: var(--header); }
-    .hint { color: var(--muted); margin-bottom: 16px; font-size: 13px; }
+    h1 { margin: 0 0 8px; font-size: 18px; color: var(--header); }
+    .hint { color: var(--muted); margin-bottom: 12px; font-size: 13px; }
 
-    .toolbar { display: flex; gap: 8px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .toolbar {
+      display: flex; gap: 10px; align-items: center;
+      margin: 10px 0 12px; flex-wrap: wrap;
+    }
+
+    .search {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 8px 10px;
+      border-radius: 10px;
+      min-width: 280px;
+    }
+    .search label { font-size: 13px; color: var(--muted); }
+    .search input {
+      border: none; outline: none; flex: 1;
+      font-size: 13px;
+      min-width: 160px;
+    }
+    .search:focus-within {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
     button {
       border: 1px solid var(--border);
       background: var(--bg2);
@@ -58,7 +82,14 @@
 
     /* Parent rows */
     tr.parent { background: #fff; font-weight: 650; }
-    tr.parent:hover { background: var(--hover); cursor: pointer; }
+    tr.parent:hover { background: var(--hover); }
+
+    /* Make ONLY the LOB cell clickable */
+    td.lob-toggle {
+      cursor: pointer;
+      user-select: none;
+    }
+    td.lob-toggle:hover { background: var(--hover); }
 
     .lob-cell { display: flex; align-items: center; gap: 8px; }
     .chev {
@@ -78,6 +109,9 @@
     tr.child td:first-child { padding-left: 34px; color: #111; font-weight: 500; }
     tr.child.hidden { display: none; }
 
+    /* Filtering */
+    tr.filtered-out { display: none !important; }
+
     /* Numbers */
     .num { text-align: right; font-variant-numeric: tabular-nums; }
   </style>
@@ -85,10 +119,16 @@
 <body>
   <h1>SORA-Eff-Int.csv (Collapsible by LOB)</h1>
   <div class="hint">
-    Click a <b>LOB</b> total row to expand/collapse its interval rows.
+    Click the <b>LOB cell</b> on a total row to expand/collapse its interval rows. Use search to show only specific LOBs.
   </div>
 
   <div class="toolbar">
+    <div class="search" title="Filter by LOB name">
+      <label for="lobSearch">Search LOB</label>
+      <input id="lobSearch" type="text" placeholder="e.g. Subrogation, Ameriben, Legacy..." />
+      <button id="clearSearch" type="button">Clear</button>
+    </div>
+
     <button id="expandAll" type="button">Expand all</button>
     <button id="collapseAll" type="button">Collapse all</button>
   </div>
@@ -101,10 +141,7 @@
   </div>
 
 <script>
-/**
- * Minimal CSV parser that supports quoted fields.
- * (Good enough for typical exported CSVs.)
- */
+/* ---------- CSV parsing ---------- */
 function parseCSV(text) {
   const rows = [];
   let row = [];
@@ -140,8 +177,6 @@ function parseCSV(text) {
 function toNumberMaybe(v) {
   const s = (v ?? "").toString().trim();
   if (s === "" || s.toLowerCase() === "nan") return s;
-
-  // already formatted percent like 97.02%
   if (s.endsWith("%")) {
     const n = Number(s.slice(0, -1));
     return Number.isFinite(n) ? n : s;
@@ -159,15 +194,7 @@ function formatCell(v, headerName) {
   return v;
 }
 
-/**
- * Your CSV pattern:
- * - Parent rows are where LOB ends with "Grand Total" OR LOB is exactly "Grand Total"
- * - Child rows have LOB like "Carelon X" with an Interval time like 08:00, 08:30...
- *
- * Example from SORA-Eff-Int.csv:
- *   "Carelon Medical Benefits Management Grand Total" + interval "nan"  => parent
- *   "Carelon Medical Benefits Management" + interval "08:00"            => child
- */
+/* ---------- Group logic specific to your file ---------- */
 function isParentRow(obj) {
   const lob = (obj["LOB"] ?? "").toString().trim().toLowerCase();
   return lob === "grand total" || lob.endsWith(" grand total") || lob.endsWith("grand total");
@@ -177,6 +204,10 @@ function baseLobName(lobVal) {
   return (lobVal ?? "").toString().trim().replace(/\s*grand total\s*$/i, "");
 }
 
+/* ---------- Render + behaviors ---------- */
+let GROUPS = []; // [{id, lobBaseLower}]
+let CURRENT_FILTER = "";
+
 async function loadAndRender() {
   const res = await fetch("./SORA-Eff-Int.csv");
   if (!res.ok) throw new Error("Failed to fetch CSV: " + res.status);
@@ -185,14 +216,10 @@ async function loadAndRender() {
   const raw = parseCSV(text);
   if (raw.length < 2) return;
 
-  // Headers as they exist in the CSV
   const headers = raw[0].map(h => h.trim());
-
-  // Display headers (rename Unnamed: 1 -> Interval)
   const displayHeaders = headers.map(h => (h === "Unnamed: 1" ? "Interval" : h));
 
-  // Convert each row -> object
-  const objs = raw.slice(1).map(r => {
+  const rows = raw.slice(1).map(r => {
     const obj = {};
     headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
     return obj;
@@ -201,7 +228,7 @@ async function loadAndRender() {
   const thead = document.querySelector("#tbl thead");
   const tbody = document.querySelector("#tbl tbody");
 
-  // Build <thead>
+  // Header
   thead.innerHTML = "";
   const trh = document.createElement("tr");
   displayHeaders.forEach(h => {
@@ -211,27 +238,34 @@ async function loadAndRender() {
   });
   thead.appendChild(trh);
 
-  // Build <tbody> with grouping
+  // Body
   tbody.innerHTML = "";
+  GROUPS = [];
   let currentGroupId = null;
   let groupIndex = 0;
 
-  objs.forEach(obj => {
+  rows.forEach(obj => {
     const parent = isParentRow(obj);
 
     if (parent) {
       currentGroupId = `g${groupIndex++}`;
 
+      const lobBase = baseLobName(obj["LOB"] || "");
+      GROUPS.push({ id: currentGroupId, lobBaseLower: lobBase.toLowerCase() });
+
       const tr = document.createElement("tr");
       tr.className = "parent";
       tr.dataset.group = currentGroupId;
+      tr.dataset.lob = lobBase;               // for search filtering display
+      tr.dataset.lobLower = lobBase.toLowerCase();
       tr.setAttribute("aria-expanded", "true");
 
       headers.forEach((h, i) => {
         const td = document.createElement("td");
 
         if (i === 0) {
-          // LOB column: show chevron + cleaned LOB name (without "Grand Total")
+          td.classList.add("lob-toggle");
+
           const wrap = document.createElement("div");
           wrap.className = "lob-cell";
 
@@ -239,13 +273,31 @@ async function loadAndRender() {
           chev.className = "chev";
 
           const label = document.createElement("span");
-          label.textContent = baseLobName(obj[h] || "(blank)");
+          label.textContent = lobBase || "(blank)";
 
           wrap.appendChild(chev);
           wrap.appendChild(label);
           td.appendChild(wrap);
+
+          // Click ONLY on this cell toggles group
+          td.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleGroup(currentGroupId);
+            // keep filter applied (so children visibility stays consistent with expanded state)
+            applyFilter(CURRENT_FILTER);
+          });
+
+          // Keyboard accessibility
+          td.tabIndex = 0;
+          td.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              toggleGroup(currentGroupId);
+              applyFilter(CURRENT_FILTER);
+            }
+          });
+
         } else if (h === "Unnamed: 1") {
-          // Interval column: make parent rows show "Grand Total"
           td.textContent = "Grand Total";
         } else {
           const val = toNumberMaybe(obj[h]);
@@ -256,12 +308,9 @@ async function loadAndRender() {
         tr.appendChild(td);
       });
 
-      tr.addEventListener("click", () => toggleGroup(currentGroupId));
       tbody.appendChild(tr);
 
     } else {
-      // Child row
-      // If CSV ever starts with a child row, we still render it (no collapsible group)
       const tr = document.createElement("tr");
       tr.className = "child";
       tr.dataset.parent = currentGroupId || "";
@@ -277,6 +326,9 @@ async function loadAndRender() {
       tbody.appendChild(tr);
     }
   });
+
+  // Initial filter (none)
+  applyFilter("");
 }
 
 function toggleGroup(groupId, forceExpand = null) {
@@ -291,19 +343,58 @@ function toggleGroup(groupId, forceExpand = null) {
   children.forEach(tr => tr.classList.toggle("hidden", !willExpand));
 }
 
+/**
+ * Filter by LOB text:
+ * - hide parent rows not matching search
+ * - for matching parents: show them
+ * - show their children ONLY if the parent is expanded
+ */
+function applyFilter(q) {
+  CURRENT_FILTER = (q ?? "").toString().trim().toLowerCase();
+
+  const parents = Array.from(document.querySelectorAll("tr.parent"));
+  parents.forEach(p => {
+    const matches = CURRENT_FILTER === "" || (p.dataset.lobLower || "").includes(CURRENT_FILTER);
+    p.classList.toggle("filtered-out", !matches);
+
+    const gid = p.dataset.group;
+    const expanded = p.getAttribute("aria-expanded") === "true";
+    const children = Array.from(document.querySelectorAll(`tr.child[data-parent="${gid}"]`));
+
+    // If parent is filtered out -> hide children.
+    // If parent is shown -> children shown only when expanded.
+    const showChildren = matches && expanded;
+    children.forEach(c => {
+      c.classList.toggle("filtered-out", !matches);
+      c.classList.toggle("hidden", !showChildren);
+    });
+  });
+}
+
+/* ---------- Wire up UI ---------- */
 document.getElementById("expandAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, true));
+  applyFilter(CURRENT_FILTER);
 });
 
 document.getElementById("collapseAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
+  applyFilter(CURRENT_FILTER);
 });
 
-// GitHub Pages: this works as long as index.html and SORA-Eff-Int.csv are in the same folder.
+const lobSearch = document.getElementById("lobSearch");
+lobSearch.addEventListener("input", () => applyFilter(lobSearch.value));
+
+document.getElementById("clearSearch").addEventListener("click", () => {
+  lobSearch.value = "";
+  lobSearch.focus();
+  applyFilter("");
+});
+
 loadAndRender().catch(err => {
   console.error(err);
   alert(
-    "Failed to load CSV. If this is GitHub Pages, confirm:\n" +
+    "Failed to load CSV. For GitHub Pages, confirm:\n" +
     "1) GitHub Pages is enabled\n" +
     "2) index.html and SORA-Eff-Int.csv are in the published folder\n" +
     "3) the CSV filename/case matches exactly\n\n" +
