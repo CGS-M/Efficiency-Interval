@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SORA Eff Int - Collapsible Table</title>
+  <style>
+    :root {
+      --border: #e5e7eb;
+      --header: #111827;
+      --muted: #6b7280;
+      --bg: #ffffff;
+      --bg2: #f9fafb;
+      --hover: #f3f4f6;
+    }
+
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); margin: 24px; color: #111; }
+    h1 { margin: 0 0 12px; font-size: 18px; color: var(--header); }
+    .hint { color: var(--muted); margin-bottom: 16px; font-size: 13px; }
+
+    .toolbar { display: flex; gap: 8px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    button {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover { background: var(--hover); }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: auto;
+      max-height: 75vh;
+    }
+
+    table { border-collapse: collapse; width: 100%; min-width: 1100px; }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--bg2);
+      z-index: 2;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 10px;
+      white-space: nowrap;
+    }
+    tbody td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px 10px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    /* Parent rows */
+    tr.parent { background: #fff; font-weight: 650; }
+    tr.parent:hover { background: var(--hover); cursor: pointer; }
+
+    .lob-cell { display: flex; align-items: center; gap: 8px; }
+    .chev {
+      width: 16px; height: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg2);
+      font-size: 11px;
+      color: #111;
+      flex: 0 0 auto;
+    }
+    tr.parent[aria-expanded="true"] .chev::before { content: "▼"; }
+    tr.parent[aria-expanded="false"] .chev::before { content: "▶"; }
+
+    /* Child rows */
+    tr.child td:first-child { padding-left: 34px; color: #111; font-weight: 500; }
+    tr.child.hidden { display: none; }
+
+    /* Numbers */
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <h1>SORA-Eff-Int.csv (Collapsible by LOB)</h1>
+  <div class="hint">
+    Click a <b>LOB</b> total row to expand/collapse its interval rows.
+  </div>
+
+  <div class="toolbar">
+    <button id="expandAll" type="button">Expand all</button>
+    <button id="collapseAll" type="button">Collapse all</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+/**
+ * Minimal CSV parser that supports quoted fields.
+ * (Good enough for typical exported CSVs.)
+ */
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+
+    if (ch === '"') {
+      if (inQuotes && next === '"') { cur += '"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if (ch === ',' && !inQuotes) {
+      row.push(cur); cur = "";
+    } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+      if (ch === '\r' && next === '\n') i++;
+      row.push(cur); cur = "";
+      if (row.some(v => v.trim() !== "")) rows.push(row);
+      row = [];
+    } else {
+      cur += ch;
+    }
+  }
+
+  if (cur.length || row.length) {
+    row.push(cur);
+    if (row.some(v => v.trim() !== "")) rows.push(row);
+  }
+  return rows;
+}
+
+function toNumberMaybe(v) {
+  const s = (v ?? "").toString().trim();
+  if (s === "" || s.toLowerCase() === "nan") return s;
+
+  // already formatted percent like 97.02%
+  if (s.endsWith("%")) {
+    const n = Number(s.slice(0, -1));
+    return Number.isFinite(n) ? n : s;
+  }
+  const n = Number(s);
+  return Number.isFinite(n) ? n : s;
+}
+
+function formatCell(v, headerName) {
+  if (typeof v === "number") {
+    if (headerName.includes("%")) return v.toFixed(2) + "%";
+    if (Number.isInteger(v)) return String(v);
+    return v.toFixed(2);
+  }
+  return v;
+}
+
+/**
+ * Your CSV pattern:
+ * - Parent rows are where LOB ends with "Grand Total" OR LOB is exactly "Grand Total"
+ * - Child rows have LOB like "Carelon X" with an Interval time like 08:00, 08:30...
+ *
+ * Example from SORA-Eff-Int.csv:
+ *   "Carelon Medical Benefits Management Grand Total" + interval "nan"  => parent
+ *   "Carelon Medical Benefits Management" + interval "08:00"            => child
+ */
+function isParentRow(obj) {
+  const lob = (obj["LOB"] ?? "").toString().trim().toLowerCase();
+  return lob === "grand total" || lob.endsWith(" grand total") || lob.endsWith("grand total");
+}
+
+function baseLobName(lobVal) {
+  return (lobVal ?? "").toString().trim().replace(/\s*grand total\s*$/i, "");
+}
+
+async function loadAndRender() {
+  const res = await fetch("./SORA-Eff-Int.csv");
+  if (!res.ok) throw new Error("Failed to fetch CSV: " + res.status);
+  const text = await res.text();
+
+  const raw = parseCSV(text);
+  if (raw.length < 2) return;
+
+  // Headers as they exist in the CSV
+  const headers = raw[0].map(h => h.trim());
+
+  // Display headers (rename Unnamed: 1 -> Interval)
+  const displayHeaders = headers.map(h => (h === "Unnamed: 1" ? "Interval" : h));
+
+  // Convert each row -> object
+  const objs = raw.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
+    return obj;
+  });
+
+  const thead = document.querySelector("#tbl thead");
+  const tbody = document.querySelector("#tbl tbody");
+
+  // Build <thead>
+  thead.innerHTML = "";
+  const trh = document.createElement("tr");
+  displayHeaders.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+
+  // Build <tbody> with grouping
+  tbody.innerHTML = "";
+  let currentGroupId = null;
+  let groupIndex = 0;
+
+  objs.forEach(obj => {
+    const parent = isParentRow(obj);
+
+    if (parent) {
+      currentGroupId = `g${groupIndex++}`;
+
+      const tr = document.createElement("tr");
+      tr.className = "parent";
+      tr.dataset.group = currentGroupId;
+      tr.setAttribute("aria-expanded", "true");
+
+      headers.forEach((h, i) => {
+        const td = document.createElement("td");
+
+        if (i === 0) {
+          // LOB column: show chevron + cleaned LOB name (without "Grand Total")
+          const wrap = document.createElement("div");
+          wrap.className = "lob-cell";
+
+          const chev = document.createElement("span");
+          chev.className = "chev";
+
+          const label = document.createElement("span");
+          label.textContent = baseLobName(obj[h] || "(blank)");
+
+          wrap.appendChild(chev);
+          wrap.appendChild(label);
+          td.appendChild(wrap);
+        } else if (h === "Unnamed: 1") {
+          // Interval column: make parent rows show "Grand Total"
+          td.textContent = "Grand Total";
+        } else {
+          const val = toNumberMaybe(obj[h]);
+          td.textContent = formatCell(val, displayHeaders[i]);
+          if (typeof val === "number") td.classList.add("num");
+        }
+
+        tr.appendChild(td);
+      });
+
+      tr.addEventListener("click", () => toggleGroup(currentGroupId));
+      tbody.appendChild(tr);
+
+    } else {
+      // Child row
+      // If CSV ever starts with a child row, we still render it (no collapsible group)
+      const tr = document.createElement("tr");
+      tr.className = "child";
+      tr.dataset.parent = currentGroupId || "";
+
+      headers.forEach((h, i) => {
+        const td = document.createElement("td");
+        const val = toNumberMaybe(obj[h]);
+        td.textContent = formatCell(val, displayHeaders[i]);
+        if (typeof val === "number") td.classList.add("num");
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    }
+  });
+}
+
+function toggleGroup(groupId, forceExpand = null) {
+  const parentRow = document.querySelector(`tr.parent[data-group="${groupId}"]`);
+  if (!parentRow) return;
+
+  const children = Array.from(document.querySelectorAll(`tr.child[data-parent="${groupId}"]`));
+  const expandedNow = parentRow.getAttribute("aria-expanded") === "true";
+  const willExpand = (forceExpand === null) ? !expandedNow : !!forceExpand;
+
+  parentRow.setAttribute("aria-expanded", willExpand ? "true" : "false");
+  children.forEach(tr => tr.classList.toggle("hidden", !willExpand));
+}
+
+document.getElementById("expandAll").addEventListener("click", () => {
+  document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, true));
+});
+
+document.getElementById("collapseAll").addEventListener("click", () => {
+  document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
+});
+
+// GitHub Pages: this works as long as index.html and SORA-Eff-Int.csv are in the same folder.
+loadAndRender().catch(err => {
+  console.error(err);
+  alert(
+    "Failed to load CSV. If this is GitHub Pages, confirm:\n" +
+    "1) GitHub Pages is enabled\n" +
+    "2) index.html and SORA-Eff-Int.csv are in the published folder\n" +
+    "3) the CSV filename/case matches exactly\n\n" +
+    "Error: " + err.message
+  );
+});
+</script>
+</body>
+</html>
