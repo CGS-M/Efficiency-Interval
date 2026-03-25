@@ -138,6 +138,7 @@
 </div>
 
 <script>
+
 /* ===== Subtitle stamp ===== */
 function formatDateLong(d){ return d.toLocaleDateString(undefined, {year:"numeric",month:"long",day:"2-digit"}); }
 function formatTimeOnly(d){ return d.toLocaleTimeString(undefined, {hour:"numeric",minute:"2-digit"}); }
@@ -268,6 +269,45 @@ function decorateThresholds(td, headerName, value, baseLobLower){
   }
 }
 
+/* ===== LOB from query string + "lock" mode ===== */
+function getLobFromQuery(){
+  const v = (new URLSearchParams(location.search).get("lob") || "").trim();
+  return v ? v : null;
+}
+function resolveLobParamToFilterText(v){
+  const s = v.toLowerCase();
+  if (s === "beacon-cc" || s === "beaconcc" || s === "beacon cc") return "Beacon CC";
+  return v;
+}
+function inLockedLobMode(){
+  // If a lob= query param is present, we treat it as "locked mode"
+  return !!getLobFromQuery();
+}
+function lockLobControls(){
+  // Make the UI clearly "locked"
+  const input = document.getElementById("lobSearch");
+  const clearBtn = document.getElementById("clearSearch");
+  const lbl = document.querySelector('.search label[for="lobSearch"]');
+
+  if(lbl) lbl.textContent = "LOB (locked)";
+
+  if(input){
+    input.setAttribute("readonly", "readonly");
+    input.setAttribute("aria-readonly", "true");
+    input.title = "LOB is locked because this page was opened with a ?lob= parameter.";
+    // Optional styling cue
+    input.style.opacity = "0.85";
+    input.style.cursor = "not-allowed";
+  }
+
+  if(clearBtn){
+    clearBtn.disabled = true;
+    clearBtn.title = "Disabled in locked mode.";
+    clearBtn.style.opacity = "0.6";
+    clearBtn.style.cursor = "not-allowed";
+  }
+}
+
 /* ===== Table build ===== */
 let CURRENT_FILTER = "";
 
@@ -384,7 +424,23 @@ async function loadAndRender(){
   document.getElementById("lobCountTotal").textContent =
     document.querySelectorAll("tr.parent").length.toString();
 
+  // Default: show all
   applyFilter("");
+
+  // If opened with ?lob=..., force filter and lock controls
+  const lobParam = getLobFromQuery();
+  if(lobParam){
+    const filterText = resolveLobParamToFilterText(lobParam);
+    const input = document.getElementById("lobSearch");
+    if(input) input.value = filterText;
+    applyFilter(filterText);
+
+    // Optional: collapse all first so it's compact, then expand shown
+    // document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
+    // applyFilter(filterText);
+
+    lockLobControls();
+  }
 }
 
 /* ===== Expand/collapse ===== */
@@ -455,9 +511,17 @@ document.getElementById("collapseAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
   applyFilter(CURRENT_FILTER);
 });
+
 const lobSearch = document.getElementById("lobSearch");
-lobSearch.addEventListener("input", () => applyFilter(lobSearch.value));
+lobSearch.addEventListener("input", () => {
+  // In locked mode, ignore typing (even if readonly is removed somehow)
+  if(inLockedLobMode()) return;
+  applyFilter(lobSearch.value);
+});
+
 document.getElementById("clearSearch").addEventListener("click", () => {
+  // In locked mode, ignore clear
+  if(inLockedLobMode()) return;
   lobSearch.value=""; lobSearch.focus(); applyFilter("");
 });
 
@@ -466,10 +530,20 @@ document.getElementById("clearSearch").addEventListener("click", () => {
   setSubtitleStamp();
   await loadThresholds();
   await loadAndRender();
+
+  // If locked, also disable the expand/collapse buttons (optional)
+  if(inLockedLobMode()){
+    const exp = document.getElementById("expandAll");
+    const col = document.getElementById("collapseAll");
+    if(exp){ exp.disabled = true; exp.style.opacity="0.6"; exp.style.cursor="not-allowed"; }
+    if(col){ col.disabled = true; col.style.opacity="0.6"; col.style.cursor="not-allowed"; }
+  }
 })().catch(err => {
   console.error(err);
   alert("Init failed: " + err.message);
 })();
 </script>
+
+
 </body>
 </html>
