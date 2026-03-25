@@ -138,7 +138,6 @@
 </div>
 
 <script>
-
 /* ===== Subtitle stamp ===== */
 function formatDateLong(d){ return d.toLocaleDateString(undefined, {year:"numeric",month:"long",day:"2-digit"}); }
 function formatTimeOnly(d){ return d.toLocaleTimeString(undefined, {hour:"numeric",minute:"2-digit"}); }
@@ -165,8 +164,7 @@ function setSubtitleStamp(){
 }
 
 /* ===== Delimited parsing (auto-detect comma vs tab) =====
-   Your latest SORA-Eff-Int.csv is TAB-delimited (not comma CSV),
-   so we detect delimiter from the header line.
+   SORA-Eff-Int.csv is TAB-delimited, so we detect delimiter from the header line.
 */
 function detectDelimiter(text){
   const firstLine = (text.split(/\r?\n/).find(l => l.trim() !== "") || "");
@@ -199,19 +197,19 @@ function formatCell(v, headerName){
   return v;
 }
 
-/* ===== Group logic ===== */
+/* ===== Group logic (TOTAL rows) ===== */
 function normalizeLOB(lobRaw){ return (lobRaw ?? "").toString().trim(); }
+
+// parent = "... Total" rows (NOT "Grand Total")
 function isParentRow(obj){
   const lob = normalizeLOB(obj["LOB"]).toLowerCase();
-  return lob === "grand total" || lob.endsWith(" grand total");
+  return lob.endsWith(" total");
 }
 function getBaseLobFromRowObj(obj){
-  return normalizeLOB(obj["LOB"]).replace(/\s*grand total\s*$/i, "").trim();
+  return normalizeLOB(obj["LOB"]).replace(/\s*total\s*$/i, "").trim();
 }
 function displayLobForParent(lobVal){
-  const raw = normalizeLOB(lobVal);
-  if(raw.toLowerCase() === "grand total") return "Grand Total";
-  return raw.replace(/\s*grand total\s*$/i, "");
+  return normalizeLOB(lobVal).replace(/\s*total\s*$/i, "").trim();
 }
 
 /* ===== Thresholds from thresholds.json ===== */
@@ -295,7 +293,6 @@ function lockLobControls(){
     input.setAttribute("readonly", "readonly");
     input.setAttribute("aria-readonly", "true");
     input.title = "LOB is locked because this page was opened with a ?lob= parameter.";
-    // Optional styling cue
     input.style.opacity = "0.85";
     input.style.cursor = "not-allowed";
   }
@@ -331,6 +328,7 @@ async function loadAndRender(){
   const thead = document.querySelector("#tbl thead");
   const tbody = document.querySelector("#tbl tbody");
 
+  /* header */
   thead.innerHTML = "";
   const trh = document.createElement("tr");
   DISPLAY_HEADERS.forEach(h => {
@@ -342,32 +340,55 @@ async function loadAndRender(){
 
   tbody.innerHTML = "";
 
-  let currentGroupId = null;
-  let groupIndex = 0;
+  /* --- Group rows by base LOB, so we can render: children first, then total row last --- */
+  const groups = new Map(); // baseLob -> { children:[], parent:null }
+  function ensureGroup(base){
+    if(!groups.has(base)) groups.set(base, { children: [], parent: null });
+    return groups.get(base);
+  }
 
   for(const obj of rows){
-    const parent = isParentRow(obj);
+    const base = getBaseLobFromRowObj(obj) || "(blank)";
+    const g = ensureGroup(base);
+    if(isParentRow(obj)) g.parent = obj;
+    else g.children.push(obj);
+  }
 
-    // If a child row appears before a parent, start a dummy group
-    if(!parent && !currentGroupId){
-      currentGroupId = `g${groupIndex++}`;
-    }
+  let groupIndex = 0;
 
-    const baseLob = getBaseLobFromRowObj(obj);
+  for(const [baseLob, g] of groups.entries()){
+    const groupId = `g${groupIndex++}`;
+    const lobLower = baseLob.toLowerCase();
     const baseLobLower = baseLob.toLowerCase();
 
-    if(parent){
-      currentGroupId = `g${groupIndex++}`;
+    // 1) children first
+    for(const obj of g.children){
+      const tr = document.createElement("tr");
+      tr.className = "child";
+      tr.dataset.parent = groupId;
 
-      const lobDisplay = displayLobForParent(obj["LOB"] || "");
-      const lobLower = lobDisplay.toLowerCase();
+      HEADERS.forEach((h,i) => {
+        const td = document.createElement("td");
+        const val = toNumberMaybe(obj[h]);
+        td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
+        if(typeof val === "number") td.classList.add("num");
+        decorateThresholds(td, h, val, baseLobLower);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    }
+
+    // 2) total (parent) row last
+    if(g.parent){
+      const obj = g.parent;
 
       const tr = document.createElement("tr");
       tr.className = "parent";
-      tr.dataset.group = currentGroupId;
-      tr.dataset.lob = lobDisplay;
+      tr.dataset.group = groupId;
+      tr.dataset.lob = baseLob;
       tr.dataset.lobLower = lobLower;
-      tr.setAttribute("aria-expanded","true");
+      tr.setAttribute("aria-expanded","true"); // default expanded
 
       HEADERS.forEach((h,i) => {
         const td = document.createElement("td");
@@ -383,14 +404,15 @@ async function loadAndRender(){
           chev.className = "chev";
 
           const label = document.createElement("span");
-          label.textContent = lobDisplay || "(blank)";
+          label.textContent = displayLobForParent(obj["LOB"] || baseLob) || "(blank)";
 
           wrap.appendChild(chev);
           wrap.appendChild(label);
           td.appendChild(wrap);
 
         } else if(h === "Unnamed: 1"){
-          td.textContent = "Grand Total";
+          // Interval column for total row
+          td.textContent = "Total";
         } else {
           const val = toNumberMaybe(obj[h]);
           td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
@@ -402,22 +424,9 @@ async function loadAndRender(){
       });
 
       tbody.appendChild(tr);
-
     } else {
-      const tr = document.createElement("tr");
-      tr.className = "child";
-      tr.dataset.parent = currentGroupId;
-
-      HEADERS.forEach((h,i) => {
-        const td = document.createElement("td");
-        const val = toNumberMaybe(obj[h]);
-        td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
-        if(typeof val === "number") td.classList.add("num");
-        decorateThresholds(td, h, val, baseLobLower);
-        tr.appendChild(td);
-      });
-
-      tbody.appendChild(tr);
+      // If no Total row exists, you can optionally skip or create a dummy parent.
+      // Leaving it out keeps the group non-collapsible.
     }
   }
 
@@ -434,11 +443,6 @@ async function loadAndRender(){
     const input = document.getElementById("lobSearch");
     if(input) input.value = filterText;
     applyFilter(filterText);
-
-    // Optional: collapse all first so it's compact, then expand shown
-    // document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
-    // applyFilter(filterText);
-
     lockLobControls();
   }
 }
@@ -482,7 +486,7 @@ function applyFilter(q){
   document.getElementById("lobCountShown").textContent = shown.toString();
 }
 
-/* ===== Edge-safe delegation toggle ===== */
+/* ===== Delegation toggle (works regardless of parent row position) ===== */
 document.querySelector("#tbl tbody").addEventListener("click", (e) => {
   const toggleCell = e.target.closest("td.lob-toggle");
   if(!toggleCell) return;
@@ -514,13 +518,11 @@ document.getElementById("collapseAll").addEventListener("click", () => {
 
 const lobSearch = document.getElementById("lobSearch");
 lobSearch.addEventListener("input", () => {
-  // In locked mode, ignore typing (even if readonly is removed somehow)
   if(inLockedLobMode()) return;
   applyFilter(lobSearch.value);
 });
 
 document.getElementById("clearSearch").addEventListener("click", () => {
-  // In locked mode, ignore clear
   if(inLockedLobMode()) return;
   lobSearch.value=""; lobSearch.focus(); applyFilter("");
 });
@@ -531,7 +533,6 @@ document.getElementById("clearSearch").addEventListener("click", () => {
   await loadThresholds();
   await loadAndRender();
 
-  // If locked, also disable the expand/collapse buttons (optional)
   if(inLockedLobMode()){
     const exp = document.getElementById("expandAll");
     const col = document.getElementById("collapseAll");
