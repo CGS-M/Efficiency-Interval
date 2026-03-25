@@ -164,7 +164,8 @@ function setSubtitleStamp(){
 }
 
 /* ===== Delimited parsing (auto-detect comma vs tab) =====
-   SORA-Eff-Int.csv is TAB-delimited, so we detect delimiter from the header line.
+   Your latest SORA-Eff-Int.csv is TAB-delimited (not comma CSV),
+   so we detect delimiter from the header line.
 */
 function detectDelimiter(text){
   const firstLine = (text.split(/\r?\n/).find(l => l.trim() !== "") || "");
@@ -197,19 +198,19 @@ function formatCell(v, headerName){
   return v;
 }
 
-/* ===== Group logic (TOTAL rows) ===== */
+/* ===== Group logic ===== */
 function normalizeLOB(lobRaw){ return (lobRaw ?? "").toString().trim(); }
-
-// parent = "... Total" rows (NOT "Grand Total")
 function isParentRow(obj){
   const lob = normalizeLOB(obj["LOB"]).toLowerCase();
-  return lob.endsWith(" total");
+  return lob === "grand total" || lob.endsWith(" grand total");
 }
 function getBaseLobFromRowObj(obj){
-  return normalizeLOB(obj["LOB"]).replace(/\s*total\s*$/i, "").trim();
+  return normalizeLOB(obj["LOB"]).replace(/\s*grand total\s*$/i, "").trim();
 }
 function displayLobForParent(lobVal){
-  return normalizeLOB(lobVal).replace(/\s*total\s*$/i, "").trim();
+  const raw = normalizeLOB(lobVal);
+  if(raw.toLowerCase() === "grand total") return "Grand Total";
+  return raw.replace(/\s*grand total\s*$/i, "");
 }
 
 /* ===== Thresholds from thresholds.json ===== */
@@ -267,44 +268,6 @@ function decorateThresholds(td, headerName, value, baseLobLower){
   }
 }
 
-/* ===== LOB from query string + "lock" mode ===== */
-function getLobFromQuery(){
-  const v = (new URLSearchParams(location.search).get("lob") || "").trim();
-  return v ? v : null;
-}
-function resolveLobParamToFilterText(v){
-  const s = v.toLowerCase();
-  if (s === "beacon-cc" || s === "beaconcc" || s === "beacon cc") return "Beacon CC";
-  return v;
-}
-function inLockedLobMode(){
-  // If a lob= query param is present, we treat it as "locked mode"
-  return !!getLobFromQuery();
-}
-function lockLobControls(){
-  // Make the UI clearly "locked"
-  const input = document.getElementById("lobSearch");
-  const clearBtn = document.getElementById("clearSearch");
-  const lbl = document.querySelector('.search label[for="lobSearch"]');
-
-  if(lbl) lbl.textContent = "LOB (locked)";
-
-  if(input){
-    input.setAttribute("readonly", "readonly");
-    input.setAttribute("aria-readonly", "true");
-    input.title = "LOB is locked because this page was opened with a ?lob= parameter.";
-    input.style.opacity = "0.85";
-    input.style.cursor = "not-allowed";
-  }
-
-  if(clearBtn){
-    clearBtn.disabled = true;
-    clearBtn.title = "Disabled in locked mode.";
-    clearBtn.style.opacity = "0.6";
-    clearBtn.style.cursor = "not-allowed";
-  }
-}
-
 /* ===== Table build ===== */
 let CURRENT_FILTER = "";
 
@@ -328,7 +291,6 @@ async function loadAndRender(){
   const thead = document.querySelector("#tbl thead");
   const tbody = document.querySelector("#tbl tbody");
 
-  /* header */
   thead.innerHTML = "";
   const trh = document.createElement("tr");
   DISPLAY_HEADERS.forEach(h => {
@@ -340,55 +302,32 @@ async function loadAndRender(){
 
   tbody.innerHTML = "";
 
-  /* --- Group rows by base LOB, so we can render: children first, then total row last --- */
-  const groups = new Map(); // baseLob -> { children:[], parent:null }
-  function ensureGroup(base){
-    if(!groups.has(base)) groups.set(base, { children: [], parent: null });
-    return groups.get(base);
-  }
-
-  for(const obj of rows){
-    const base = getBaseLobFromRowObj(obj) || "(blank)";
-    const g = ensureGroup(base);
-    if(isParentRow(obj)) g.parent = obj;
-    else g.children.push(obj);
-  }
-
+  let currentGroupId = null;
   let groupIndex = 0;
 
-  for(const [baseLob, g] of groups.entries()){
-    const groupId = `g${groupIndex++}`;
-    const lobLower = baseLob.toLowerCase();
-    const baseLobLower = baseLob.toLowerCase();
+  for(const obj of rows){
+    const parent = isParentRow(obj);
 
-    // 1) children first
-    for(const obj of g.children){
-      const tr = document.createElement("tr");
-      tr.className = "child";
-      tr.dataset.parent = groupId;
-
-      HEADERS.forEach((h,i) => {
-        const td = document.createElement("td");
-        const val = toNumberMaybe(obj[h]);
-        td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
-        if(typeof val === "number") td.classList.add("num");
-        decorateThresholds(td, h, val, baseLobLower);
-        tr.appendChild(td);
-      });
-
-      tbody.appendChild(tr);
+    // If a child row appears before a parent, start a dummy group
+    if(!parent && !currentGroupId){
+      currentGroupId = `g${groupIndex++}`;
     }
 
-    // 2) total (parent) row last
-    if(g.parent){
-      const obj = g.parent;
+    const baseLob = getBaseLobFromRowObj(obj);
+    const baseLobLower = baseLob.toLowerCase();
+
+    if(parent){
+      currentGroupId = `g${groupIndex++}`;
+
+      const lobDisplay = displayLobForParent(obj["LOB"] || "");
+      const lobLower = lobDisplay.toLowerCase();
 
       const tr = document.createElement("tr");
       tr.className = "parent";
-      tr.dataset.group = groupId;
-      tr.dataset.lob = baseLob;
+      tr.dataset.group = currentGroupId;
+      tr.dataset.lob = lobDisplay;
       tr.dataset.lobLower = lobLower;
-      tr.setAttribute("aria-expanded","true"); // default expanded
+      tr.setAttribute("aria-expanded","true");
 
       HEADERS.forEach((h,i) => {
         const td = document.createElement("td");
@@ -404,15 +343,14 @@ async function loadAndRender(){
           chev.className = "chev";
 
           const label = document.createElement("span");
-          label.textContent = displayLobForParent(obj["LOB"] || baseLob) || "(blank)";
+          label.textContent = lobDisplay || "(blank)";
 
           wrap.appendChild(chev);
           wrap.appendChild(label);
           td.appendChild(wrap);
 
         } else if(h === "Unnamed: 1"){
-          // Interval column for total row
-          td.textContent = "Total";
+          td.textContent = "Grand Total";
         } else {
           const val = toNumberMaybe(obj[h]);
           td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
@@ -424,27 +362,29 @@ async function loadAndRender(){
       });
 
       tbody.appendChild(tr);
+
     } else {
-      // If no Total row exists, you can optionally skip or create a dummy parent.
-      // Leaving it out keeps the group non-collapsible.
+      const tr = document.createElement("tr");
+      tr.className = "child";
+      tr.dataset.parent = currentGroupId;
+
+      HEADERS.forEach((h,i) => {
+        const td = document.createElement("td");
+        const val = toNumberMaybe(obj[h]);
+        td.textContent = formatCell(val, DISPLAY_HEADERS[i]);
+        if(typeof val === "number") td.classList.add("num");
+        decorateThresholds(td, h, val, baseLobLower);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
     }
   }
 
   document.getElementById("lobCountTotal").textContent =
     document.querySelectorAll("tr.parent").length.toString();
 
-  // Default: show all
   applyFilter("");
-
-  // If opened with ?lob=..., force filter and lock controls
-  const lobParam = getLobFromQuery();
-  if(lobParam){
-    const filterText = resolveLobParamToFilterText(lobParam);
-    const input = document.getElementById("lobSearch");
-    if(input) input.value = filterText;
-    applyFilter(filterText);
-    lockLobControls();
-  }
 }
 
 /* ===== Expand/collapse ===== */
@@ -486,7 +426,7 @@ function applyFilter(q){
   document.getElementById("lobCountShown").textContent = shown.toString();
 }
 
-/* ===== Delegation toggle (works regardless of parent row position) ===== */
+/* ===== Edge-safe delegation toggle ===== */
 document.querySelector("#tbl tbody").addEventListener("click", (e) => {
   const toggleCell = e.target.closest("td.lob-toggle");
   if(!toggleCell) return;
@@ -515,15 +455,9 @@ document.getElementById("collapseAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
   applyFilter(CURRENT_FILTER);
 });
-
 const lobSearch = document.getElementById("lobSearch");
-lobSearch.addEventListener("input", () => {
-  if(inLockedLobMode()) return;
-  applyFilter(lobSearch.value);
-});
-
+lobSearch.addEventListener("input", () => applyFilter(lobSearch.value));
 document.getElementById("clearSearch").addEventListener("click", () => {
-  if(inLockedLobMode()) return;
   lobSearch.value=""; lobSearch.focus(); applyFilter("");
 });
 
@@ -532,19 +466,10 @@ document.getElementById("clearSearch").addEventListener("click", () => {
   setSubtitleStamp();
   await loadThresholds();
   await loadAndRender();
-
-  if(inLockedLobMode()){
-    const exp = document.getElementById("expandAll");
-    const col = document.getElementById("collapseAll");
-    if(exp){ exp.disabled = true; exp.style.opacity="0.6"; exp.style.cursor="not-allowed"; }
-    if(col){ col.disabled = true; col.style.opacity="0.6"; col.style.cursor="not-allowed"; }
-  }
 })().catch(err => {
   console.error(err);
   alert("Init failed: " + err.message);
 })();
 </script>
-
-
 </body>
 </html>
