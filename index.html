@@ -4,149 +4,139 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Carelon Services + Efficiency Interval Report</title>
- 
-  <style>
-    :root{
-      --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e2e8f0; --header:#0b1220;
-      --primary:#1d4ed8; --primary-weak:rgba(29,78,216,.12);
-      --shadow-soft:0 6px 16px rgba(2,6,23,.06);
-      --row-hover:#f1f5f9; --row-alt:#fbfcff; --sticky:#f8fafc;
-      --good:#16a34a; --bad:#dc2626; --bad-bg:rgba(220,38,38,.08); --good-bg:rgba(22,163,74,.08);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.4}
-    .page{width:80vw;margin:28px auto;padding:0 18px 28px}
- 
-    .topbar{
-      background:linear-gradient(180deg, rgba(29,78,216,.10), rgba(29,78,216,0));
-      border:1px solid var(--border); border-radius:16px;
-      padding:18px 18px 14px; box-shadow:var(--shadow-soft);
-    }
-    .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
-    h1{margin:0;font-size:18px;letter-spacing:.2px;color:var(--header)}
-    .subtitle{margin-top:6px;color:var(--muted);font-size:13px}
- 
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.7);font-size:12px;color:var(--muted);white-space:nowrap}
-    .dot{width:9px;height:9px;border-radius:999px;background:var(--primary);box-shadow:0 0 0 4px var(--primary-weak)}
- 
-    .controls{margin-top:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .left-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .search{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.9);min-width:340px}
-    .search label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.2px}
-    .search input{flex:1;border:none;outline:none;font-size:13px;background:transparent;color:var(--text);min-width:160px}
-    .search:focus-within{border-color:rgba(29,78,216,.45);box-shadow:0 0 0 4px rgba(29,78,216,.12)}
- 
-    .btn{border:1px solid var(--border);background:#fff;padding:10px 12px;border-radius:12px;cursor:pointer;font-size:13px;color:var(--text);box-shadow:0 1px 0 rgba(2,6,23,.02)}
-    .btn:hover{background:#f8fafc}
-    .btn:active{transform:translateY(1px)}
-    .btn-primary{border-color:rgba(29,78,216,.35);background:rgba(29,78,216,.10);color:#0b2f9b}
-    .btn-primary:hover{background:rgba(29,78,216,.14)}
- 
-    .right-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-    .stat{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.9);color:var(--muted);font-size:12px;white-space:nowrap}
-    .stat b{color:var(--text);font-weight:700}
- 
-    .table-card{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-soft);overflow:hidden}
-    .table-wrap{overflow:auto;max-height:74vh}
-    table{border-collapse:separate;border-spacing:0;width:100%;min-width:1180px}
- 
-    thead th{
-      position:sticky;top:0;z-index:5;background:var(--sticky);
-      border-bottom:1px solid var(--border);
-      font-size:12px;color:#0b1220;text-align:left;padding:12px 12px;white-space:nowrap;letter-spacing:.15px
-    }
-    tbody td{border-bottom:1px solid var(--border);padding:10px 12px;font-size:13px;white-space:nowrap;vertical-align:middle;color:#0f172a}
-    tbody tr:nth-child(even){background:var(--row-alt)}
-    tbody tr:hover{background:var(--row-hover)}
- 
-    tr.parent{background:#fff !important;font-weight:750}
-    tr.parent td{border-bottom:1px solid rgba(226,232,240,.9)}
- 
-    td.lob-toggle{cursor:pointer;user-select:none}
-    td.lob-toggle:focus{outline:none;box-shadow:inset 0 0 0 2px rgba(29,78,216,.35);border-radius:8px}
-    .lob-cell{display:flex;align-items:center;gap:10px}
-    .chev{
-      width:18px;height:18px;border-radius:8px;border:1px solid var(--border);
-      display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#0f172a;font-size:11px;flex:0 0 auto
-    }
-    tr.parent[aria-expanded="true"] .chev::before{content:"▼"}
-    tr.parent[aria-expanded="false"] .chev::before{content:"▶"}
- 
-    tr.child td:first-child{padding-left:44px;color:#0f172a;font-weight:550}
-    tr.child.hidden{display:none}
-    tr.filtered-out{display:none !important}
- 
-    .num{text-align:right;font-variant-numeric:tabular-nums;color:#0b1220}
-    td.kpi{font-weight:750}
-    td.kpi.good{color:var(--good);background:var(--good-bg)}
-    td.kpi.bad{color:var(--bad);background:var(--bad-bg)}
- 
-    thead th:first-child{border-top-left-radius:16px}
-    thead th:last-child{border-top-right-radius:16px}
 
-  
-     .card{
-  position: relative;
-  height: 90px;
-}
-#carlimg {
-bottom: 30px;
-position:relative;
- overflow: visible;
-  z-index: 2;
-left: 10px;
-    height: 150px;
-}
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e2e8f0; --header:#0b1220;
+    --primary:#1d4ed8; --primary-weak:rgba(29,78,216,.12);
+    --shadow-soft:0 6px 16px rgba(2,6,23,.06);
+    --row-hover:#f1f5f9; --row-alt:#fbfcff; --sticky:#f8fafc;
+    --good:#16a34a; --bad:#dc2626; --bad-bg:rgba(220,38,38,.08); --good-bg:rgba(22,163,74,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.4}
+  .page{width:80vw;margin:28px auto;padding:0 18px 28px}
+
+  .topbar{
+    background:linear-gradient(180deg, rgba(29,78,216,.10), rgba(29,78,216,0));
+    border:1px solid var(--border); border-radius:16px;
+    padding:18px 18px 14px; box-shadow:var(--shadow-soft);
+  }
+  .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  h1{margin:0;font-size:18px;letter-spacing:.2px;color:var(--header)}
+  .subtitle{margin-top:6px;color:var(--muted);font-size:13px}
+
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.7);font-size:12px;color:var(--muted);white-space:nowrap}
+  .dot{width:9px;height:9px;border-radius:999px;background:var(--primary);box-shadow:0 0 0 4px var(--primary-weak)}
+
+  .controls{margin-top:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .left-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .search{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.9);min-width:340px}
+  .search label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.2px}
+  .search input{flex:1;border:none;outline:none;font-size:13px;background:transparent;color:var(--text);min-width:160px}
+  .search:focus-within{border-color:rgba(29,78,216,.45);box-shadow:0 0 0 4px rgba(29,78,216,.12)}
+
+  .btn{border:1px solid var(--border);background:#fff;padding:10px 12px;border-radius:12px;cursor:pointer;font-size:13px;color:var(--text);box-shadow:0 1px 0 rgba(2,6,23,.02)}
+  .btn:hover{background:#f8fafc}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{border-color:rgba(29,78,216,.35);background:rgba(29,78,216,.10);color:#0b2f9b}
+  .btn-primary:hover{background:rgba(29,78,216,.14)}
+
+  .right-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  .stat{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.9);color:var(--muted);font-size:12px;white-space:nowrap}
+  .stat b{color:var(--text);font-weight:700}
+
+  .table-card{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-soft);overflow:hidden}
+  .table-wrap{overflow:auto;max-height:74vh}
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1180px}
+
+  thead th{
+    position:sticky;top:0;z-index:5;background:var(--sticky);
+    border-bottom:1px solid var(--border);
+    font-size:12px;color:#0b1220;text-align:left;padding:12px 12px;white-space:nowrap;letter-spacing:.15px
+  }
+  tbody td{border-bottom:1px solid var(--border);padding:10px 12px;font-size:13px;white-space:nowrap;vertical-align:middle;color:#0f172a}
+  tbody tr:nth-child(even){background:var(--row-alt)}
+  tbody tr:hover{background:var(--row-hover)}
+
+  tr.parent{background:#fff !important;font-weight:750}
+  tr.parent td{border-bottom:1px solid rgba(226,232,240,.9)}
+
+  td.lob-toggle{cursor:pointer;user-select:none}
+  td.lob-toggle:focus{outline:none;box-shadow:inset 0 0 0 2px rgba(29,78,216,.35);border-radius:8px}
+  .lob-cell{display:flex;align-items:center;gap:10px}
+  .chev{
+    width:18px;height:18px;border-radius:8px;border:1px solid var(--border);
+    display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#0f172a;font-size:11px;flex:0 0 auto
+  }
+  tr.parent[aria-expanded="true"] .chev::before{content:"▼"}
+  tr.parent[aria-expanded="false"] .chev::before{content:"▶"}
+
+  tr.child td:first-child{padding-left:44px;color:#0f172a;font-weight:550}
+  tr.child.hidden{display:none}
+  tr.filtered-out{display:none !important}
+
+  .num{text-align:right;font-variant-numeric:tabular-nums;color:#0b1220}
+  td.kpi{font-weight:750}
+  td.kpi.good{color:var(--good);background:var(--good-bg)}
+  td.kpi.bad{color:var(--bad);background:var(--bad-bg)}
+
+  thead th:first-child{border-top-left-radius:16px}
+  thead th:last-child{border-top-right-radius:16px}
+
+  .card{position:relative;height:90px}
+  #carlimg{bottom:30px;position:relative;overflow:visible;z-index:2;left:10px;height:150px}
 </style>
 </head>
- 
+
 <body>
 <div class="page">
- 
- <div class="card">
-<img id="carlimg" src="https://raw.githubusercontent.com/CGS-M/Efficiency-Interval/main/carl.png" alt="carl">
+
+  <div class="card">
+    <img id="carlimg" src="https://raw.githubusercontent.com/CGS-M/Efficiency-Interval/main/carl.png" alt="carl">
+  </div>
+
+  <div class="topbar">
+    <div class="title-row">
+      <div>
+        <h1>CS+ Efficiency Interval Report</h1>
+        <div class="subtitle">day, <span id="reportStamp">Loading…</span></div>
+      </div>
+      <div class="pill" title="Data source loaded from SORA-Eff-Int.csv">
+        <span class="dot"></span>
+        <span>Source: <b>SORA-Eff-Int.csv</b></span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="left-controls">
+        <div class="search" title="Filter by LOB name">
+          <label for="lobSearch">LOB</label>
+          <input id="lobSearch" type="text" placeholder="Search (e.g., Subrogation, Ameriben, Legacy...)" />
+          <button id="clearSearch" class="btn" type="button">Clear</button>
+        </div>
+
+        <button id="expandAll" class="btn btn-primary" type="button">Expand all</button>
+        <button id="collapseAll" class="btn" type="button">Collapse all</button>
+      </div>
+
+      <div class="right-controls">
+        <div class="stat"><b id="lobCountShown">0</b> / <b id="lobCountTotal">0</b> LOBs shown</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table id="tbl">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
- 
-<div class="topbar">
-<div class="title-row">
-<div>
-<h1>CS+ Efficiency Interval Report</h1>
-<div class="subtitle">day, <span id="reportStamp">Loading…</span></div>
-</div>
-<div class="pill" title="Data source loaded from SORA-Eff-Int.csv">
-<span class="dot"></span>
-<span>Source: <b>SORA-Eff-Int.csv</b></span>
-</div>
-</div>
- 
-      <div class="controls">
-<div class="left-controls">
-<div class="search" title="Filter by LOB name">
-<label for="lobSearch">LOB</label>
-<input id="lobSearch" type="text" placeholder="Search (e.g., Subrogation, Ameriben, Legacy...)" />
-<button id="clearSearch" class="btn" type="button">Clear</button>
-</div>
- 
-          <button id="expandAll" class="btn btn-primary" type="button">Expand all</button>
-<button id="collapseAll" class="btn" type="button">Collapse all</button>
-</div>
- 
-        <div class="right-controls">
-<div class="stat"><b id="lobCountShown">0</b> / <b id="lobCountTotal">0</b> LOBs shown</div>
-</div>
-</div>
-</div>
- 
-    <div class="table-card">
-<div class="table-wrap">
-<table id="tbl">
-<thead></thead>
-<tbody></tbody>
-</table>
-</div>
-</div>
-</div>
- 
+
 <script>
 /* ===== Subtitle stamp ===== */
 function formatDateLong(d){ return d.toLocaleDateString(undefined, {year:"numeric",month:"long",day:"2-digit"}); }
@@ -172,31 +162,23 @@ function setSubtitleStamp(){
   }
   el.textContent = `${dateText} — as of ${timeText}`;
 }
- 
-/* ===== CSV parsing ===== */
-function parseCSV(text){
-  const rows=[]; let row=[]; let cur=""; let inQuotes=false;
-  for(let i=0;i<text.length;i++){
-    const ch=text[i], next=text[i+1];
-    if(ch === '"'){
-      if(inQuotes && next === '"'){ cur+='"'; i++; }
-      else inQuotes = !inQuotes;
-    } else if(ch === ',' && !inQuotes){
-      row.push(cur); cur="";
-    } else if((ch === '\n' || ch === '\r') && !inQuotes){
-      if(ch === '\r' && next === '\n') i++;
-      row.push(cur); cur="";
-      if(row.some(v=>v.trim()!=="")) rows.push(row);
-      row=[];
-    } else cur += ch;
-  }
-  if(cur.length || row.length){
-    row.push(cur);
-    if(row.some(v=>v.trim()!=="")) rows.push(row);
-  }
-  return rows;
+
+/* ===== Delimited parsing (auto-detect comma vs tab) =====
+   Your latest SORA-Eff-Int.csv is TAB-delimited (not comma CSV),
+   so we detect delimiter from the header line.
+*/
+function detectDelimiter(text){
+  const firstLine = (text.split(/\r?\n/).find(l => l.trim() !== "") || "");
+  const commaCount = (firstLine.match(/,/g) || []).length;
+  const tabCount = (firstLine.match(/\t/g) || []).length;
+  return tabCount > commaCount ? "\t" : ",";
 }
- 
+function parseDelimited(text){
+  const delim = detectDelimiter(text);
+  const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
+  return lines.map(line => line.split(delim).map(cell => cell.trim()));
+}
+
 function toNumberMaybe(v){
   const s=(v??"").toString().trim();
   if(s==="" || s.toLowerCase()==="nan") return s;
@@ -215,18 +197,14 @@ function formatCell(v, headerName){
   }
   return v;
 }
- 
-/* ===== Group logic (robust for your CSV) ===== */
-function normalizeLOB(lobRaw){
-  return (lobRaw ?? "").toString().trim();
-}
+
+/* ===== Group logic ===== */
+function normalizeLOB(lobRaw){ return (lobRaw ?? "").toString().trim(); }
 function isParentRow(obj){
-  // Parent: LOB ends with "Grand Total" OR LOB equals "Grand Total"
   const lob = normalizeLOB(obj["LOB"]).toLowerCase();
   return lob === "grand total" || lob.endsWith(" grand total");
 }
 function getBaseLobFromRowObj(obj){
-  // For parent rows: strip trailing "Grand Total"; for child rows unchanged
   return normalizeLOB(obj["LOB"]).replace(/\s*grand total\s*$/i, "").trim();
 }
 function displayLobForParent(lobVal){
@@ -234,19 +212,19 @@ function displayLobForParent(lobVal){
   if(raw.toLowerCase() === "grand total") return "Grand Total";
   return raw.replace(/\s*grand total\s*$/i, "");
 }
- 
+
 /* ===== Thresholds from thresholds.json ===== */
 let THRESHOLDS = { serviceLevelMin: 80, otfMaxPercent: 100, lobs: {} };
- 
+
 async function loadThresholds(){
   try{
-    const res = await fetch("./thresholds.json");
+    const res = await fetch("./thresholds.json", { cache: "no-store" });
     if(!res.ok) throw new Error("HTTP " + res.status);
     const json = await res.json();
- 
+
     THRESHOLDS.serviceLevelMin = Number.isFinite(Number(json.serviceLevelMin)) ? Number(json.serviceLevelMin) : 80;
     THRESHOLDS.otfMaxPercent = Number.isFinite(Number(json.otfMaxPercent)) ? Number(json.otfMaxPercent) : 100;
- 
+
     THRESHOLDS.lobs = {};
     if(json.lobs && typeof json.lobs === "object"){
       for(const [k,v] of Object.entries(json.lobs)){
@@ -261,7 +239,7 @@ async function loadThresholds(){
     console.warn("thresholds.json not loaded. Using defaults.", e);
   }
 }
- 
+
 function decorateThresholds(td, headerName, value, baseLobLower){
   if(headerName === "Service Level%"){
     if(typeof value !== "number") return;
@@ -289,84 +267,88 @@ function decorateThresholds(td, headerName, value, baseLobLower){
     return;
   }
 }
- 
+
 /* ===== Table build ===== */
 let CURRENT_FILTER = "";
- 
+
 async function loadAndRender(){
-  const res = await fetch("./SORA-Eff-Int.csv");
+  const res = await fetch("./SORA-Eff-Int.csv", { cache: "no-store" });
   if(!res.ok) throw new Error("Failed to fetch CSV: " + res.status);
   const text = await res.text();
- 
-  const raw = parseCSV(text);
+
+  const raw = parseDelimited(text);
   if(raw.length < 2) return;
- 
+
   const HEADERS = raw[0].map(h => h.trim());
   const DISPLAY_HEADERS = HEADERS.map(h => (h === "Unnamed: 1" ? "Interval" : h));
+
   const rows = raw.slice(1).map(r => {
     const obj = {};
     HEADERS.forEach((h,i) => obj[h] = (r[i] ?? "").trim());
     return obj;
   });
- 
+
   const thead = document.querySelector("#tbl thead");
   const tbody = document.querySelector("#tbl tbody");
- 
+
   thead.innerHTML = "";
   const trh = document.createElement("tr");
-  DISPLAY_HEADERS.forEach(h => { const th=document.createElement("th"); th.textContent=h; trh.appendChild(th); });
+  DISPLAY_HEADERS.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    trh.appendChild(th);
+  });
   thead.appendChild(trh);
- 
+
   tbody.innerHTML = "";
- 
+
   let currentGroupId = null;
   let groupIndex = 0;
- 
+
   for(const obj of rows){
     const parent = isParentRow(obj);
- 
-    // If we see a child before any parent, start a dummy group so it doesn't break
+
+    // If a child row appears before a parent, start a dummy group
     if(!parent && !currentGroupId){
       currentGroupId = `g${groupIndex++}`;
-      // (No parent row for this group; it will just show as ungrouped children)
     }
- 
+
     const baseLob = getBaseLobFromRowObj(obj);
     const baseLobLower = baseLob.toLowerCase();
- 
+
     if(parent){
       currentGroupId = `g${groupIndex++}`;
- 
+
       const lobDisplay = displayLobForParent(obj["LOB"] || "");
       const lobLower = lobDisplay.toLowerCase();
- 
+
       const tr = document.createElement("tr");
       tr.className = "parent";
       tr.dataset.group = currentGroupId;
       tr.dataset.lob = lobDisplay;
       tr.dataset.lobLower = lobLower;
       tr.setAttribute("aria-expanded","true");
- 
+
       HEADERS.forEach((h,i) => {
         const td = document.createElement("td");
- 
+
         if(i === 0){
           td.classList.add("lob-toggle");
           td.tabIndex = 0;
- 
+
           const wrap = document.createElement("div");
           wrap.className = "lob-cell";
- 
+
           const chev = document.createElement("span");
           chev.className = "chev";
- 
+
           const label = document.createElement("span");
           label.textContent = lobDisplay || "(blank)";
- 
+
           wrap.appendChild(chev);
           wrap.appendChild(label);
           td.appendChild(wrap);
- 
+
         } else if(h === "Unnamed: 1"){
           td.textContent = "Grand Total";
         } else {
@@ -375,17 +357,17 @@ async function loadAndRender(){
           if(typeof val === "number") td.classList.add("num");
           decorateThresholds(td, h, val, baseLobLower);
         }
- 
+
         tr.appendChild(td);
       });
- 
+
       tbody.appendChild(tr);
- 
+
     } else {
       const tr = document.createElement("tr");
       tr.className = "child";
       tr.dataset.parent = currentGroupId;
- 
+
       HEADERS.forEach((h,i) => {
         const td = document.createElement("td");
         const val = toNumberMaybe(obj[h]);
@@ -394,54 +376,56 @@ async function loadAndRender(){
         decorateThresholds(td, h, val, baseLobLower);
         tr.appendChild(td);
       });
- 
+
       tbody.appendChild(tr);
     }
   }
- 
+
   document.getElementById("lobCountTotal").textContent =
     document.querySelectorAll("tr.parent").length.toString();
- 
+
   applyFilter("");
 }
- 
+
 /* ===== Expand/collapse ===== */
 function toggleGroup(groupId, forceExpand=null){
   const parentRow = document.querySelector(`tr.parent[data-group="${groupId}"]`);
   if(!parentRow) return;
- 
+
   const children = Array.from(document.querySelectorAll(`tr.child[data-parent="${groupId}"]`));
   const expandedNow = parentRow.getAttribute("aria-expanded") === "true";
   const willExpand = (forceExpand===null) ? !expandedNow : !!forceExpand;
- 
+
   parentRow.setAttribute("aria-expanded", willExpand ? "true" : "false");
   children.forEach(tr => tr.classList.toggle("hidden", !willExpand));
 }
- 
+
 /* ===== Filtering ===== */
 function applyFilter(q){
   CURRENT_FILTER = (q ?? "").toString().trim().toLowerCase();
+
   const parents = Array.from(document.querySelectorAll("tr.parent"));
   let shown = 0;
- 
+
   for(const p of parents){
     const matches = CURRENT_FILTER==="" || (p.dataset.lobLower||"").includes(CURRENT_FILTER);
     p.classList.toggle("filtered-out", !matches);
     if(matches) shown++;
- 
+
     const gid = p.dataset.group;
     const expanded = p.getAttribute("aria-expanded")==="true";
     const children = Array.from(document.querySelectorAll(`tr.child[data-parent="${gid}"]`));
- 
+
     const showChildren = matches && expanded;
     children.forEach(c => {
       c.classList.toggle("filtered-out", !matches);
       c.classList.toggle("hidden", !showChildren);
     });
   }
+
   document.getElementById("lobCountShown").textContent = shown.toString();
 }
- 
+
 /* ===== Edge-safe delegation toggle ===== */
 document.querySelector("#tbl tbody").addEventListener("click", (e) => {
   const toggleCell = e.target.closest("td.lob-toggle");
@@ -451,7 +435,6 @@ document.querySelector("#tbl tbody").addEventListener("click", (e) => {
   toggleGroup(parentRow.dataset.group);
   applyFilter(CURRENT_FILTER);
 });
- 
 document.querySelector("#tbl tbody").addEventListener("keydown", (e) => {
   if(e.key !== "Enter" && e.key !== " ") return;
   const toggleCell = e.target.closest("td.lob-toggle");
@@ -462,7 +445,7 @@ document.querySelector("#tbl tbody").addEventListener("keydown", (e) => {
   toggleGroup(parentRow.dataset.group);
   applyFilter(CURRENT_FILTER);
 });
- 
+
 /* ===== Controls ===== */
 document.getElementById("expandAll").addEventListener("click", () => {
   document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, true));
@@ -477,7 +460,7 @@ lobSearch.addEventListener("input", () => applyFilter(lobSearch.value));
 document.getElementById("clearSearch").addEventListener("click", () => {
   lobSearch.value=""; lobSearch.focus(); applyFilter("");
 });
- 
+
 /* ===== Init ===== */
 (async function init(){
   setSubtitleStamp();
@@ -485,12 +468,7 @@ document.getElementById("clearSearch").addEventListener("click", () => {
   await loadAndRender();
 })().catch(err => {
   console.error(err);
-  alert(
-    "Failed to load report. Confirm:\n" +
-    "1) index.html, SORA-Eff-Int.csv, thresholds.json are in the published folder\n" +
-    "2) filenames/case match exactly\n\n" +
-    "Error: " + err.message
-  );
+  alert("Init failed: " + err.message);
 })();
 </script>
 </body>
