@@ -1,5 +1,5 @@
 ﻿LOB,Interval,Forecasted Calls,Offered Calls,Answered Calls,Service Level%,ASA (secs),ABN%,Sum of OTF.,Sum of AHT.,Sum of Occ.,Sum of Met SLA
-Caremore Provider (CPCS) Grand Total,,233,212,211,87.26%,22,0.47%,90.99%,413,53.41%,185
+Caremore Provider (CPCS) Grand Total,,322,306,305,90.20%,19,0.33%,95.03%,408,61.64%,276
 Caremore Provider (CPCS),8:00,2,1,1,100.00%,4,0.00%,50.00%,485,13.34%,1
 Caremore Provider (CPCS),8:30,1,2,2,100.00%,5,0.00%,200.00%,320,21.66%,2
 Caremore Provider (CPCS),9:00,8,7,7,100.00%,4,0.00%,87.50%,409,30.71%,7
@@ -9,7 +9,9 @@ Caremore Provider (CPCS),10:30,28,28,28,100.00%,7,0.00%,100.00%,445,49.94%,28
 Caremore Provider (CPCS),11:00,41,32,32,100.00%,5,0.00%,78.05%,452,66.24%,32
 Caremore Provider (CPCS),11:30,45,43,42,97.67%,6,2.33%,95.56%,383,67.50%,42
 Caremore Provider (CPCS),12:00,36,37,37,100.00%,5,0.00%,102.78%,450,57.75%,37
-Caremore Provider (CPCS),12:30,43,45,45,42.22%,83,0.00%,104.65%,410,90.60%,19
+Caremore Provider (CPCS),12:30,43,58,58,51.72%,72,0.00%,134.88%,427,91.69%,30
+Caremore Provider (CPCS),13:00,44,48,48,97.92%,10,0.00%,109.09%,433,94.75%,47
+Caremore Provider (CPCS),13:30,45,33,33,100.00%,6,0.00%,73.33%,311,100.00%,33
 Carelon Behavioral Health (Beacon CC) Grand Total,,506,484,483,99.79%,3,0.21%,95.60%,426,62.35%,482
 Carelon Behavioral Health (Beacon CC),8:00,16,11,11,100.00%,7,0.00%,67.07%,355,20.92%,11
 Carelon Behavioral Health (Beacon CC),8:30,27,24,24,100.00%,7,0.00%,89.22%,347,27.61%,24
