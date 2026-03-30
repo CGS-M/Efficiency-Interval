@@ -91,7 +91,7 @@
 
 <body>
 <div class="page">
-<!-- removing laro 
+  <!-- removing laro
   <div class="card">
     <img id="carlimg" src="https://raw.githubusercontent.com/CGS-M/Efficiency-Interval/main/carl.png" alt="carl">
   </div> -->
@@ -134,33 +134,73 @@
       </table>
     </div>
   </div>
-
 </div>
 
 <script>
-/* ===== Subtitle stamp ===== */
+/* ===== Subtitle stamp (based on commit date/time of SORA-Eff-Int.csv) =====
+   This uses the GitHub REST API:
+   GET /repos/:owner/:repo/commits?path=SORA-Eff-Int.csv&per_page=1
+
+   IMPORTANT:
+   - Works for PUBLIC repos.
+   - For PRIVATE repos or heavy traffic, you may need an auth token.
+*/
+
 function formatDateLong(d){ return d.toLocaleDateString(undefined, {year:"numeric",month:"long",day:"2-digit"}); }
 function formatTimeOnly(d){ return d.toLocaleTimeString(undefined, {hour:"numeric",minute:"2-digit"}); }
-function getAsOfTimeFromQuery(){
-  const asof = (new URLSearchParams(location.search).get("asof") || "").trim();
-  return /^\d{1,2}:\d{2}$/.test(asof) ? asof : null;
+
+/* --- Configure these for your repo --- */
+const GITHUB_OWNER  = "CGS-M";
+const GITHUB_REPO   = "Efficiency-Interval";
+const GITHUB_BRANCH = ""; // optional e.g. "main"
+const CSV_PATH      = "SORA-Eff-Int.csv";
+
+/* Optional: if you want a specific timezone display, set TZ via locale options instead.
+   For now we display in the user's local time (browser). */
+
+async function getCsvCommitTimestamp(){
+  const params = new URLSearchParams({ path: CSV_PATH, per_page: "1" });
+  if(GITHUB_BRANCH) params.set("sha", GITHUB_BRANCH);
+
+  const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/commits?` + params.toString();
+
+  const res = await fetch(apiUrl, {
+    cache: "no-store",
+    headers: { "Accept": "application/vnd.github+json" }
+  });
+
+  if(!res.ok){
+    throw new Error(`GitHub commits API failed (${res.status}).`);
+  }
+
+  const commits = await res.json();
+  if(!Array.isArray(commits) || commits.length === 0){
+    throw new Error("No commit history found for " + CSV_PATH);
+  }
+
+  const iso =
+    commits[0]?.commit?.committer?.date ||
+    commits[0]?.commit?.author?.date;
+
+  if(!iso) throw new Error("Commit date missing from GitHub response.");
+
+  return new Date(iso);
 }
-function setSubtitleStamp(){
+
+async function setSubtitleStampFromCsvCommit(){
   const el = document.getElementById("reportStamp");
   if(!el) return;
-  const now = new Date();
-  const dateText = formatDateLong(now);
-  const asof = getAsOfTimeFromQuery();
-  let timeText;
-  if(asof){
-    const [hh, mm] = asof.split(":").map(Number);
-    const d = new Date(now);
-    d.setHours(hh, mm, 0, 0);
-    timeText = formatTimeOnly(d);
-  } else {
-    timeText = formatTimeOnly(now);
+
+  el.textContent = "Loading…";
+
+  try{
+    const commitDate = await getCsvCommitTimestamp();
+    el.textContent = `${formatDateLong(commitDate)} — as of ${formatTimeOnly(commitDate)}`;
+  } catch(e){
+    console.warn("Falling back to local time for subtitle stamp:", e);
+    const now = new Date();
+    el.textContent = `${formatDateLong(now)} — as of ${formatTimeOnly(now)}`;
   }
-  el.textContent = `${dateText} — as of ${timeText}`;
 }
 
 /* ===== Delimited parsing (auto-detect comma vs tab) =====
@@ -434,10 +474,6 @@ async function loadAndRender(){
     if(input) input.value = filterText;
     applyFilter(filterText);
 
-    // Optional: collapse all first so it's compact, then expand shown
-    // document.querySelectorAll("tr.parent").forEach(p => toggleGroup(p.dataset.group, false));
-    // applyFilter(filterText);
-
     lockLobControls();
   }
 }
@@ -526,7 +562,9 @@ document.getElementById("clearSearch").addEventListener("click", () => {
 
 /* ===== Init ===== */
 (async function init(){
-  setSubtitleStamp();
+  // NEW: subtitle uses commit date/time of SORA-Eff-Int.csv
+  await setSubtitleStampFromCsvCommit();
+
   await loadThresholds();
   await loadAndRender();
 
@@ -543,6 +581,5 @@ document.getElementById("clearSearch").addEventListener("click", () => {
 })();
 </script>
 
-  
 </body>
 </html>
