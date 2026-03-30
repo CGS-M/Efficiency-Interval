@@ -1,9 +1,9 @@
 ﻿LOB,Interval,Forecasted Calls,Offered Calls,Answered Calls,Service Level%,ASA (secs),ABN%,Sum of OTF.,Sum of AHT.,Sum of Occ.,Sum of Met SLA
-Caremore Provider (CPCS) Grand Total,,318,374,368,69.25%,50,1.60%,117.61%,447,70.15%,259
-Caremore Provider (CPCS),8:00,3,1,1,100.00%,9,0.00%,33.33%,554,25.91%,1
-Caremore Provider (CPCS),8:30,3,2,2,100.00%,4,0.00%,66.67%,435,53.49%,2
-Caremore Provider (CPCS),9:00,7,4,4,100.00%,3,0.00%,57.14%,59,4.66%,4
-Caremore Provider (CPCS),9:30,11,7,7,100.00%,4,0.00%,63.64%,217,14.92%,7
+Caremore Provider (CPCS) Grand Total,,407,462,454,69.70%,49,1.73%,113.51%,435,70.68%,322
+Caremore Provider (CPCS),08:00,3,1,1,100.00%,9,0.00%,33.33%,554,25.91%,1
+Caremore Provider (CPCS),08:30,3,2,2,100.00%,4,0.00%,66.67%,435,53.49%,2
+Caremore Provider (CPCS),09:00,7,4,4,100.00%,3,0.00%,57.14%,59,4.66%,4
+Caremore Provider (CPCS),09:30,11,7,7,100.00%,4,0.00%,63.64%,217,14.92%,7
 Caremore Provider (CPCS),10:00,16,10,10,100.00%,8,0.00%,62.50%,468,28.71%,10
 Caremore Provider (CPCS),10:30,20,10,10,100.00%,8,0.00%,50.00%,363,31.58%,10
 Caremore Provider (CPCS),11:00,27,26,26,100.00%,6,0.00%,96.30%,485,52.02%,26
@@ -12,7 +12,9 @@ Caremore Provider (CPCS),12:00,42,56,55,76.79%,34,1.79%,133.33%,376,74.74%,43
 Caremore Provider (CPCS),12:30,41,48,48,87.50%,19,0.00%,117.07%,452,78.56%,42
 Caremore Provider (CPCS),13:00,38,59,59,47.46%,80,0.00%,155.26%,507,98.21%,28
 Caremore Provider (CPCS),13:30,39,50,50,56.00%,63,0.00%,128.21%,587,94.37%,28
-Caremore Provider (CPCS),14:00,42,59,54,30.51%,130,8.47%,140.48%,414,97.95%,18
+Caremore Provider (CPCS),14:00,42,61,56,31.15%,128,8.20%,145.24%,482,98.29%,19
+Caremore Provider (CPCS),14:30,43,45,43,46.67%,83,4.44%,104.65%,481,88.68%,21
+Caremore Provider (CPCS),15:00,46,41,41,100.00%,7,0.00%,89.13%,187,45.28%,41
 Carelon Behavioral Health (Beacon CC) Grand Total,,858,872,869,99.43%,3,0.34%,101.57%,412,66.62%,865
 Carelon Behavioral Health (Beacon CC),08:00,16,17,16,100.00%,2,5.88%,105.85%,402,41.44%,16
 Carelon Behavioral Health (Beacon CC),08:30,30,13,13,92.31%,11,0.00%,43.05%,403,25.66%,12
