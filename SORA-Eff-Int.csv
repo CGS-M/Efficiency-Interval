@@ -1,25 +1,13 @@
 ﻿LOB,Interval,Forecasted Calls,Offered Calls,Answered Calls,Service Level%,ASA (secs),ABN%,Sum of OTF.,Sum of AHT.,Sum of Occ.,Sum of Met SLA
-Caremore Provider (CPCS) Grand Total,,701,534,530,96.82%,10,0.75%,76.18%,422,66.40%,517
-Caremore Provider (CPCS),8:00,4,1,1,100.00%,5,0.00%,25.00%,351,9.10%,1
-Caremore Provider (CPCS),8:30,3,1,1,100.00%,7,0.00%,33.33%,552,33.08%,1
-Caremore Provider (CPCS),9:00,13,6,6,100.00%,3,0.00%,46.15%,141,11.97%,6
-Caremore Provider (CPCS),9:30,10,18,18,100.00%,5,0.00%,180.00%,353,50.38%,18
-Caremore Provider (CPCS),10:00,20,30,29,93.33%,13,3.33%,150.00%,368,68.61%,28
-Caremore Provider (CPCS),10:30,25,17,17,100.00%,8,0.00%,68.00%,664,48.43%,17
-Caremore Provider (CPCS),11:00,36,37,36,89.19%,13,2.70%,102.78%,442,67.95%,33
-Caremore Provider (CPCS),11:30,35,43,43,100.00%,6,0.00%,122.86%,495,77.91%,43
-Caremore Provider (CPCS),12:00,55,49,49,100.00%,7,0.00%,89.09%,461,81.47%,49
-Caremore Provider (CPCS),12:30,47,42,42,100.00%,8,0.00%,89.36%,440,71.34%,42
-Caremore Provider (CPCS),13:00,49,56,54,96.43%,9,3.57%,114.29%,396,77.60%,54
-Caremore Provider (CPCS),13:30,41,48,48,85.42%,22,0.00%,117.07%,491,76.34%,41
-Caremore Provider (CPCS),14:00,50,52,52,96.15%,11,0.00%,104.00%,404,76.53%,50
-Caremore Provider (CPCS),14:30,45,44,44,100.00%,9,0.00%,97.78%,513,70.82%,44
-Caremore Provider (CPCS),15:00,52,39,39,100.00%,7,0.00%,75.00%,386,56.39%,39
-Caremore Provider (CPCS),15:30,46,37,37,100.00%,8,0.00%,80.43%,317,49.59%,37
-Caremore Provider (CPCS),16:00,50,14,14,100.00%,7,0.00%,28.00%,3,10.52%,14
-Caremore Provider (CPCS),16:30,49,0,0,0.00%,0,0.00%,0.00%,0,0.00%,0
-Caremore Provider (CPCS),17:00,34,0,0,0.00%,0,0.00%,0.00%,0,0.00%,0
-Caremore Provider (CPCS),17:30,37,0,0,0.00%,0,0.00%,0.00%,0,0.00%,0
+Caremore Provider (CPCS) Grand Total,,155,92,91,98.91%,6,1.09%,59.35%,524,46.66%,91
+Caremore Provider (CPCS),8:00,4,1,1,100.00%,8,0.00%,25.00%,411,21.35%,1
+Caremore Provider (CPCS),8:30,6,6,6,100.00%,3,0.00%,100.00%,214,12.29%,6
+Caremore Provider (CPCS),9:00,6,4,3,75.00%,3,25.00%,66.67%,350,36.18%,3
+Caremore Provider (CPCS),9:30,7,10,10,100.00%,7,0.00%,142.86%,336,24.16%,10
+Caremore Provider (CPCS),10:00,18,5,5,100.00%,5,0.00%,27.78%,557,33.94%,5
+Caremore Provider (CPCS),10:30,34,10,10,100.00%,11,0.00%,29.41%,580,47.06%,10
+Caremore Provider (CPCS),11:00,37,25,25,100.00%,7,0.00%,67.57%,535,51.74%,25
+Caremore Provider (CPCS),11:30,43,31,31,100.00%,6,0.00%,72.09%,633,73.70%,31
 Carelon Behavioral Health (Beacon CC) Grand Total,,1590,1554,1545,98.58%,4,0.58%,97.72%,424,60.24%,1527
 Carelon Behavioral Health (Beacon CC),08:00,17,17,17,100.00%,11,0.00%,99.42%,255,15.13%,17
 Carelon Behavioral Health (Beacon CC),08:30,31,35,35,100.00%,4,0.00%,114.01%,243,25.21%,35
