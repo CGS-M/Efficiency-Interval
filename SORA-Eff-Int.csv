@@ -1,5 +1,5 @@
 ﻿LOB,Interval,Forecasted Calls,Offered Calls,Answered Calls,Service Level%,ASA (secs),ABN%,Sum of OTF.,Sum of AHT.,Sum of Occ.,Sum of Met SLA
-Carelon Behavioral Health (Beacon CC) Grand Total,,638,619,616,98.70%,5,0.16%,97.05%,372,71.62%,608
+Carelon Behavioral Health (Beacon CC) Grand Total,,1074,1076,1066,95.88%,8,0.74%,100.22%,420,78.62%,1023
 Carelon Behavioral Health (Beacon CC),08:00,24,22,22,100.00%,4,0.00%,90.80%,176,24.38%,22
 Carelon Behavioral Health (Beacon CC),08:30,44,47,47,100.00%,2,0.00%,106.41%,291,49.28%,47
 Carelon Behavioral Health (Beacon CC),09:00,64,74,74,100.00%,4,0.00%,114.80%,300,56.19%,74
@@ -7,8 +7,12 @@ Carelon Behavioral Health (Beacon CC),09:30,88,85,85,100.00%,3,0.00%,97.04%,306,
 Carelon Behavioral Health (Beacon CC),10:00,100,84,84,98.81%,3,0.00%,83.80%,368,76.19%,83
 Carelon Behavioral Health (Beacon CC),10:30,101,86,86,100.00%,6,0.00%,85.36%,506,84.77%,86
 Carelon Behavioral Health (Beacon CC),11:00,110,105,105,100.00%,2,0.00%,95.55%,371,74.19%,105
-Carelon Behavioral Health (Beacon CC),11:30,106,116,113,93.81%,9,0.86%,108.93%,421,81.47%,106
-Carelon Medical Benefits Management Grand Total,,923,1017,1017,98.92%,2,0.00%,110.14%,410,51.94%,1006
+Carelon Behavioral Health (Beacon CC),11:30,106,116,113,93.81%,9,0.86%,108.93%,425,81.64%,106
+Carelon Behavioral Health (Beacon CC),12:00,94,121,118,99.16%,3,1.65%,128.68%,442,82.69%,118
+Carelon Behavioral Health (Beacon CC),12:30,103,113,114,96.46%,11,0.00%,109.51%,497,92.55%,109
+Carelon Behavioral Health (Beacon CC),13:00,118,106,104,100.00%,3,1.89%,89.94%,509,83.91%,104
+Carelon Behavioral Health (Beacon CC),13:30,121,117,114,73.04%,32,2.56%,96.94%,483,90.64%,84
+Carelon Medical Benefits Management Grand Total,,1423,1600,1595,90.56%,11,0.19%,112.41%,426,59.63%,1448
 Carelon Medical Benefits Management,08:00,29,32,32,100.00%,2,0.00%,108.62%,247,8.60%,32
 Carelon Medical Benefits Management,08:30,86,92,92,100.00%,1,0.00%,106.90%,353,40.48%,92
 Carelon Medical Benefits Management,09:00,127,164,164,100.00%,1,0.00%,129.35%,420,59.66%,164
@@ -17,16 +21,24 @@ Carelon Medical Benefits Management,10:00,133,149,150,100.67%,1,0.00%,111.62%,41
 Carelon Medical Benefits Management,10:30,140,150,150,100.00%,1,0.00%,107.33%,410,51.87%,150
 Carelon Medical Benefits Management,11:00,133,153,153,100.00%,1,0.00%,114.80%,431,53.20%,153
 Carelon Medical Benefits Management,11:30,143,130,130,100.00%,1,0.00%,91.01%,428,52.59%,130
-Legacy Behavioral Health Grand Total,,118,133,133,100.00%,2,0.00%,113.00%,583,42.32%,133
+Carelon Medical Benefits Management,12:00,123,142,138,88.73%,16,0.70%,115.43%,424,72.55%,126
+Carelon Medical Benefits Management,12:30,125,157,158,71.34%,30,0.64%,125.93%,464,83.94%,112
+Carelon Medical Benefits Management,13:00,121,137,129,71.53%,33,0.73%,112.84%,463,78.71%,98
+Carelon Medical Benefits Management,13:30,131,147,153,72.60%,30,0.00%,112.31%,454,73.20%,106
+Legacy Behavioral Health Grand Total,,193,214,214,100.00%,2,0.00%,111.02%,564,40.46%,214
 Legacy Behavioral Health,08:00,6,4,4,100.00%,8,0.00%,65.41%,757,25.63%,4
 Legacy Behavioral Health,08:30,10,12,12,100.00%,3,0.00%,125.17%,454,28.07%,12
 Legacy Behavioral Health,09:00,13,9,9,100.00%,4,0.00%,70.91%,597,30.36%,9
-Legacy Behavioral Health,09:30,17,10,10,100.00%,2,0.00%,57.33%,770,31.03%,10
-Legacy Behavioral Health,10:00,15,23,23,100.00%,2,0.00%,154.52%,541,36.45%,23
-Legacy Behavioral Health,10:30,22,27,27,100.00%,1,0.00%,121.66%,554,58.83%,27
-Legacy Behavioral Health,11:00,20,26,26,100.00%,1,0.00%,127.13%,389,44.04%,26
-Legacy Behavioral Health,11:30,14,22,22,100.00%,1,0.00%,153.45%,769,67.24%,22
-Carelon Subrogation Grand Total,,112,94,94,98.94%,5,0.00%,83.73%,382,44.73%,93
+Legacy Behavioral Health,09:30,17,10,10,100.00%,2,0.00%,57.33%,770,30.98%,10
+Legacy Behavioral Health,10:00,15,23,23,100.00%,2,0.00%,154.52%,541,34.40%,23
+Legacy Behavioral Health,10:30,22,27,27,100.00%,1,0.00%,121.66%,554,56.29%,27
+Legacy Behavioral Health,11:00,20,26,26,100.00%,1,0.00%,127.13%,389,40.64%,26
+Legacy Behavioral Health,11:30,14,22,22,100.00%,1,0.00%,153.45%,769,63.01%,22
+Legacy Behavioral Health,12:00,17,23,23,100.00%,1,0.00%,136.14%,564,48.91%,23
+Legacy Behavioral Health,12:30,22,21,21,100.00%,1,0.00%,97.46%,637,49.62%,21
+Legacy Behavioral Health,13:00,19,18,18,100.00%,1,0.00%,95.70%,461,31.70%,18
+Legacy Behavioral Health,13:30,18,19,19,100.00%,2,0.00%,106.69%,413,27.02%,19
+Carelon Subrogation Grand Total,,199,174,174,99.43%,3,0.00%,87.54%,381,44.73%,173
 Carelon Subrogation,08:30,8,4,4,100.00%,3,0.00%,51.61%,360,20.15%,4
 Carelon Subrogation,09:00,13,11,11,100.00%,3,0.00%,88.00%,326,24.93%,11
 Carelon Subrogation,09:30,13,13,13,100.00%,1,0.00%,100.00%,325,34.98%,13
@@ -34,7 +46,11 @@ Carelon Subrogation,10:00,18,21,21,95.24%,7,0.00%,120.00%,392,64.63%,20
 Carelon Subrogation,10:30,19,11,11,100.00%,1,0.00%,59.46%,416,47.43%,11
 Carelon Subrogation,11:00,20,18,18,100.00%,7,0.00%,91.51%,320,48.65%,18
 Carelon Subrogation,11:30,23,16,16,100.00%,6,0.00%,68.55%,479,63.83%,16
-Ameriben - Provider Grand Total,,36,48,48,93.75%,4,0.00%,135.10%,593,46.47%,45
+Carelon Subrogation,12:00,18,19,19,100.00%,1,0.00%,107.04%,351,32.98%,19
+Carelon Subrogation,12:30,22,20,20,100.00%,1,0.00%,89.89%,436,42.19%,20
+Carelon Subrogation,13:00,23,18,18,100.00%,1,0.00%,78.26%,330,34.79%,18
+Carelon Subrogation,13:30,24,23,23,100.00%,2,0.00%,97.87%,392,75.89%,23
+Ameriben - Provider Grand Total,,61,74,74,90.54%,7,0.00%,120.68%,654,50.26%,67
 Ameriben - Provider,08:00,1,1,1,100.00%,3,0.00%,105.26%,334,6.19%,1
 Ameriben - Provider,08:30,3,3,3,100.00%,2,0.00%,103.45%,345,13.52%,3
 Ameriben - Provider,09:00,3,7,7,85.71%,7,0.00%,216.72%,545,63.69%,6
@@ -43,16 +59,24 @@ Ameriben - Provider,10:00,5,7,7,100.00%,2,0.00%,132.83%,358,30.35%,7
 Ameriben - Provider,10:30,6,7,7,71.43%,13,0.00%,118.04%,669,70.45%,5
 Ameriben - Provider,11:00,7,10,10,100.00%,2,0.00%,141.24%,793,63.36%,10
 Ameriben - Provider,11:30,6,8,8,100.00%,1,0.00%,132.67%,592,47.20%,8
-Ameriben - Member Grand Total,,90,83,83,96.39%,7,0.00%,92.40%,816,43.17%,80
+Ameriben - Provider,12:00,5,4,4,100.00%,1,0.00%,78.74%,283,16.60%,4
+Ameriben - Provider,12:30,5,5,5,100.00%,1,0.00%,101.21%,1141,62.38%,5
+Ameriben - Provider,13:00,6,5,5,100.00%,1,0.00%,77.40%,855,49.93%,5
+Ameriben - Provider,13:30,9,12,12,66.67%,27,0.00%,128.89%,625,76.74%,8
+Ameriben - Member Grand Total,,151,123,123,97.56%,6,0.00%,81.41%,910,42.35%,120
 Ameriben - Member,08:00,5,8,8,75.00%,29,0.00%,165.98%,505,50.85%,6
 Ameriben - Member,08:30,6,5,5,80.00%,52,0.00%,83.06%,258,5.28%,4
 Ameriben - Member,09:00,8,6,6,100.00%,2,0.00%,71.17%,812,33.89%,6
-Ameriben - Member,09:30,12,11,11,100.00%,2,0.00%,90.16%,913,49.28%,11
-Ameriben - Member,10:00,10,15,15,100.00%,2,0.00%,142.99%,999,69.58%,15
-Ameriben - Member,10:30,13,13,13,100.00%,1,0.00%,102.04%,1195,63.26%,13
-Ameriben - Member,11:00,17,13,13,100.00%,2,0.00%,76.88%,770,47.26%,13
-Ameriben - Member,11:30,18,12,12,100.00%,3,0.00%,65.86%,594,26.23%,12
-Caremore Provider (CPCS) Grand Total,,136,130,130,93.08%,13,0.00%,95.59%,406,50.84%,121
+Ameriben - Member,09:30,12,11,11,100.00%,2,0.00%,90.16%,913,49.17%,11
+Ameriben - Member,10:00,10,15,15,100.00%,2,0.00%,142.99%,999,64.15%,15
+Ameriben - Member,10:30,13,13,13,100.00%,1,0.00%,102.04%,1195,59.96%,13
+Ameriben - Member,11:00,17,13,13,100.00%,2,0.00%,76.88%,770,43.94%,13
+Ameriben - Member,11:30,18,12,12,100.00%,3,0.00%,65.86%,594,24.48%,12
+Ameriben - Member,12:00,15,11,11,100.00%,1,0.00%,75.09%,1127,59.86%,11
+Ameriben - Member,12:30,16,10,10,100.00%,1,0.00%,62.27%,1382,59.79%,10
+Ameriben - Member,13:00,13,12,12,100.00%,2,0.00%,90.98%,862,44.93%,12
+Ameriben - Member,13:30,17,7,7,100.00%,5,0.00%,40.32%,971,19.71%,7
+Caremore Provider (CPCS) Grand Total,,300,276,276,96.38%,7,0.00%,92.00%,430,56.00%,266
 Caremore Provider (CPCS),8:00,3,4,4,100.00%,14,0.00%,133.33%,293,24.19%,4
 Caremore Provider (CPCS),8:30,6,8,8,100.00%,1,0.00%,133.33%,263,32.34%,8
 Caremore Provider (CPCS),9:00,9,7,7,85.71%,12,0.00%,77.78%,712,64.68%,6
@@ -60,4 +84,10 @@ Caremore Provider (CPCS),9:30,11,10,10,90.00%,14,0.00%,90.91%,404,42.45%,9
 Caremore Provider (CPCS),10:00,14,26,26,73.08%,41,0.00%,185.71%,400,78.58%,19
 Caremore Provider (CPCS),10:30,19,19,19,100.00%,1,0.00%,100.00%,431,37.05%,19
 Caremore Provider (CPCS),11:00,31,25,25,100.00%,1,0.00%,80.65%,419,46.79%,25
-Caremore Provider (CPCS),11:30,43,31,31,100.00%,8,0.00%,72.09%,363,58.66%,31
+Caremore Provider (CPCS),11:30,43,39,39,97.44%,11,0.00%,90.70%,415,65.71%,38
+Caremore Provider (CPCS),12:00,37,41,41,100.00%,2,0.00%,110.81%,430,59.25%,41
+Caremore Provider (CPCS),12:30,39,37,37,100.00%,2,0.00%,94.87%,525,73.15%,37
+Caremore Provider (CPCS),13:00,44,32,32,100.00%,1,0.00%,72.73%,380,50.08%,32
+Caremore Provider (CPCS),13:30,44,28,28,100.00%,1,0.00%,63.64%,418,53.39%,28
+,,,,,,,,,,,
+,,,,,,,,,,,
