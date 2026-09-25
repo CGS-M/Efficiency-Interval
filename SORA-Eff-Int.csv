@@ -1,38 +1,38 @@
 ﻿LOB,Interval,Forecasted Calls,Offered Calls,Answered Calls,Service Level%,ASA (secs),ABN%,Sum of OTF.,Sum of AHT.,Sum of Occ.,Sum of Met SLA
-Carelon Behavioral Health (Beacon CC) Grand Total,,1263,1346,1343,97.02%,7,0.22%,106.58%,408,59.42%,1304
-Carelon Behavioral Health (Beacon CC),08:00,16,23,23,100.00%,3,0.00%,147.63%,191,12.03%,23
-Carelon Behavioral Health (Beacon CC),08:30,31,33,33,100.00%,2,0.00%,107.67%,343,41.34%,33
-Carelon Behavioral Health (Beacon CC),09:00,51,73,73,100.00%,2,0.00%,142.77%,340,40.23%,73
-Carelon Behavioral Health (Beacon CC),09:30,66,84,84,100.00%,3,0.00%,127.91%,374,51.43%,84
-Carelon Behavioral Health (Beacon CC),10:00,80,93,93,100.00%,2,0.00%,115.61%,370,54.47%,93
-Carelon Behavioral Health (Beacon CC),10:30,79,75,75,100.00%,2,0.00%,94.36%,435,56.73%,75
-Carelon Behavioral Health (Beacon CC),11:00,96,108,108,100.00%,3,0.00%,112.07%,394,51.84%,108
-Carelon Behavioral Health (Beacon CC),11:30,102,85,85,100.00%,2,0.00%,83.12%,445,65.01%,85
-Carelon Behavioral Health (Beacon CC),12:00,88,105,104,100.00%,3,0.95%,118.79%,407,64.12%,104
-Carelon Behavioral Health (Beacon CC),12:30,93,84,84,100.00%,4,0.00%,89.95%,467,72.04%,84
-Carelon Behavioral Health (Beacon CC),13:00,89,104,102,61.17%,58,1.92%,117.04%,462,75.59%,63
-Carelon Behavioral Health (Beacon CC),13:30,89,95,95,100.00%,2,0.00%,106.84%,385,66.90%,95
-Carelon Behavioral Health (Beacon CC),14:00,105,99,99,100.00%,2,0.00%,94.64%,390,68.87%,99
-Carelon Behavioral Health (Beacon CC),14:30,89,97,97,100.00%,4,0.00%,108.76%,467,79.54%,97
-Carelon Behavioral Health (Beacon CC),15:00,95,91,91,100.00%,4,0.00%,95.89%,429,69.10%,91
-Carelon Behavioral Health (Beacon CC),15:30,93,97,97,100.00%,3,0.00%,104.29%,429,64.77%,97
-Carelon Medical Benefits Management Grand Total,,1800,1872,1865,91.28%,11,0.37%,104.01%,0,0.00%,1706
-Carelon Medical Benefits Management,08:00,27,34,34,100.00%,2,0.00%,128.21%,0,0.00%,34
-Carelon Medical Benefits Management,08:30,82,101,101,100.00%,1,0.00%,123.04%,0,0.00%,101
-Carelon Medical Benefits Management,09:00,121,113,113,100.00%,1,0.00%,93.30%,0,0.00%,113
-Carelon Medical Benefits Management,09:30,118,131,131,100.00%,1,0.00%,110.81%,0,0.00%,131
-Carelon Medical Benefits Management,10:00,125,138,138,100.00%,1,0.00%,110.58%,0,0.00%,138
-Carelon Medical Benefits Management,10:30,135,142,142,100.00%,1,0.00%,104.87%,0,0.00%,142
-Carelon Medical Benefits Management,11:00,142,127,126,99.21%,1,0.00%,89.53%,0,0.00%,126
-Carelon Medical Benefits Management,11:30,129,141,141,99.29%,2,0.71%,109.65%,0,0.00%,139
-Carelon Medical Benefits Management,12:00,122,131,131,100.00%,1,0.00%,107.09%,0,0.00%,131
-Carelon Medical Benefits Management,12:30,116,115,114,100.00%,1,0.87%,99.15%,0,0.00%,114
-Carelon Medical Benefits Management,13:00,116,97,97,89.69%,10,0.00%,83.34%,0,0.00%,87
-Carelon Medical Benefits Management,13:30,121,125,124,91.94%,7,0.80%,103.03%,0,0.00%,114
-Carelon Medical Benefits Management,14:00,113,116,116,68.97%,33,0.00%,102.79%,0,0.00%,80
-Carelon Medical Benefits Management,14:30,119,134,125,38.81%,91,2.99%,112.31%,0,0.00%,52
-Carelon Medical Benefits Management,15:00,111,114,118,85.96%,17,0.00%,102.44%,0,0.00%,98
-Carelon Medical Benefits Management,15:30,102,113,114,93.81%,6,0.00%,110.98%,0,0.00%,106
+Carelon Behavioral Health (Beacon CC) Grand Total,,1263,1346,1343,97.02%,7,0.22%,106.58%,410,63.28%,1304
+Carelon Behavioral Health (Beacon CC),08:00,16,23,23,100.00%,3,0.00%,147.63%,184,17.30%,23
+Carelon Behavioral Health (Beacon CC),08:30,31,33,33,100.00%,2,0.00%,107.67%,269,30.41%,33
+Carelon Behavioral Health (Beacon CC),09:00,51,73,73,100.00%,2,0.00%,142.77%,284,39.86%,73
+Carelon Behavioral Health (Beacon CC),09:30,66,84,84,100.00%,3,0.00%,127.91%,329,45.39%,84
+Carelon Behavioral Health (Beacon CC),10:00,80,93,93,100.00%,2,0.00%,115.61%,375,68.19%,93
+Carelon Behavioral Health (Beacon CC),10:30,79,75,75,100.00%,2,0.00%,94.36%,524,69.23%,75
+Carelon Behavioral Health (Beacon CC),11:00,96,108,108,100.00%,3,0.00%,112.07%,360,63.52%,108
+Carelon Behavioral Health (Beacon CC),11:30,102,85,85,100.00%,2,0.00%,83.12%,439,70.00%,85
+Carelon Behavioral Health (Beacon CC),12:00,88,105,104,100.00%,3,0.95%,118.79%,406,61.92%,104
+Carelon Behavioral Health (Beacon CC),12:30,93,84,84,100.00%,4,0.00%,89.95%,505,87.41%,84
+Carelon Behavioral Health (Beacon CC),13:00,89,104,102,61.17%,58,1.92%,117.04%,491,90.06%,63
+Carelon Behavioral Health (Beacon CC),13:30,89,95,95,100.00%,2,0.00%,106.84%,434,69.46%,95
+Carelon Behavioral Health (Beacon CC),14:00,105,99,99,100.00%,2,0.00%,94.64%,373,60.88%,99
+Carelon Behavioral Health (Beacon CC),14:30,89,97,97,100.00%,4,0.00%,108.76%,503,71.53%,97
+Carelon Behavioral Health (Beacon CC),15:00,95,91,91,100.00%,4,0.00%,95.89%,385,58.09%,91
+Carelon Behavioral Health (Beacon CC),15:30,93,97,97,100.00%,3,0.00%,104.29%,404,62.18%,97
+Carelon Medical Benefits Management Grand Total,,1800,1872,1865,91.28%,11,0.37%,104.01%,407,56.99%,1706
+Carelon Medical Benefits Management,08:00,27,34,34,100.00%,2,0.00%,128.21%,196,9.94%,34
+Carelon Medical Benefits Management,08:30,82,101,101,100.00%,1,0.00%,123.04%,371,45.83%,101
+Carelon Medical Benefits Management,09:00,121,113,113,100.00%,1,0.00%,93.30%,374,40.39%,113
+Carelon Medical Benefits Management,09:30,118,131,131,100.00%,1,0.00%,110.81%,402,55.04%,131
+Carelon Medical Benefits Management,10:00,125,138,138,100.00%,1,0.00%,110.58%,368,48.73%,138
+Carelon Medical Benefits Management,10:30,135,142,142,100.00%,1,0.00%,104.87%,388,50.18%,142
+Carelon Medical Benefits Management,11:00,142,127,126,99.21%,1,0.00%,89.53%,418,46.47%,126
+Carelon Medical Benefits Management,11:30,129,141,141,99.29%,2,0.71%,109.65%,448,62.52%,139
+Carelon Medical Benefits Management,12:00,122,131,131,100.00%,1,0.00%,107.09%,408,65.71%,131
+Carelon Medical Benefits Management,12:30,116,115,114,100.00%,1,0.87%,99.15%,436,61.71%,114
+Carelon Medical Benefits Management,13:00,116,97,97,89.69%,10,0.00%,83.34%,434,64.16%,87
+Carelon Medical Benefits Management,13:30,121,125,124,91.94%,7,0.80%,103.03%,342,64.35%,114
+Carelon Medical Benefits Management,14:00,113,116,116,68.97%,33,0.00%,102.79%,403,76.77%,80
+Carelon Medical Benefits Management,14:30,119,134,125,38.81%,91,2.99%,112.31%,440,87.95%,52
+Carelon Medical Benefits Management,15:00,111,114,118,85.96%,17,0.00%,102.44%,463,78.45%,98
+Carelon Medical Benefits Management,15:30,102,113,114,93.81%,6,0.00%,110.98%,450,66.88%,106
 Legacy Behavioral Health Grand Total,,316,345,344,98.55%,3,0.29%,109.24%,626,60.28%,339
 Legacy Behavioral Health,08:00,5,2,2,100.00%,3,0.00%,43.59%,193,2.36%,2
 Legacy Behavioral Health,08:30,8,6,6,100.00%,2,0.00%,79.39%,412,14.82%,6
